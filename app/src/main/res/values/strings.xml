@@ -1,0 +1,14 @@
+<resources>
+
+    <string name="app_name">Восток-27</string>
+
+    <string name="loading">Загрузка…</string>
+    <string name="share_to">Поделиться</string>
+    <string name="ok">ОК</string>
+
+    <string name="nav_sensors_values">Показатели</string>
+    <string name="nav_chart">График</string>
+    <string name="nav_switchers">Модули</string>
+    <string name="nav_options">Параметры</string>
+
+</resources>

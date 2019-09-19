@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_sensors_values"
+        android:icon="@drawable/ic_outline_board"
+        android:title="@string/nav_sensors_values" />
+
+    <item
+        android:id="@+id/nav_chart"
+        android:icon="@drawable/ic_outline_chart"
+        android:title="@string/nav_chart" />
+
+    <item
+        android:id="@+id/nav_switchers"
+        android:icon="@drawable/ic_outline_conf"
+        android:title="@string/nav_switchers" />
+
+    <item
+        android:id="@+id/nav_options"
+        android:icon="@drawable/ic_outline_settings"
+        android:title="@string/nav_options" />
+
+</menu>

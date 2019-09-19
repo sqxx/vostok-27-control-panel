@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Common -->
+
+    <style name="AppTheme" parent="AppThemeBase">
+        <item name="android:navigationBarColor">@color/white</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
+    <!-- Splash screen-->
+
+    <style name="AppTheme.Splash" parent="AppTheme.SplashBase">
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
+
+</resources>
