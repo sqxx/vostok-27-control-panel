@@ -2,6 +2,7 @@ package open.sqxx.vostok27.di.module
 
 import android.content.Context
 import android.content.res.AssetManager
+import app.akexorcist.bluetotohspp.library.BluetoothSPP
 import open.sqxx.vostok27.BuildConfig
 import open.sqxx.vostok27.di.CacheLifetime
 import open.sqxx.vostok27.di.DefaultPageSize
@@ -36,6 +37,8 @@ class AppModule(context: Context) : Module() {
 		bind(AssetManager::class.java).toInstance(context.assets)
 		bind(SystemMessageNotifier::class.java).toInstance(SystemMessageNotifier())
 
+		bind(BluetoothSPP::class.java).toInstance(BluetoothSPP(context))
+
 		// Navigation
 		Cicerone.create().apply {
 			bind(Router::class.java).toInstance(router)
@@ -53,5 +56,8 @@ class AppModule(context: Context) : Module() {
 				BuildConfig.FEEDBACK_URL
 			)
 		)
+
+		// Bluetooth
+
 	}
 }

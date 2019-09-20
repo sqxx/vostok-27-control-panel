@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import app.akexorcist.bluetotohspp.library.BluetoothSPP
 import com.arellomobile.mvp.MvpAppCompatActivity
 import io.reactivex.disposables.Disposable
 import open.sqxx.vostok27.R
@@ -31,6 +32,9 @@ class MainActivity : MvpAppCompatActivity() {
 	@Inject
 	lateinit var systemMessageNotifier: SystemMessageNotifier
 
+	@Inject
+	lateinit var bt: BluetoothSPP
+
 	private var notifierDisposable: Disposable? = null
 
 	private val currentFragment: BaseFragment?
@@ -50,7 +54,6 @@ class MainActivity : MvpAppCompatActivity() {
 		}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
-		Thread.sleep(1000)
 		setTheme(R.style.AppTheme)
 		Toothpick.inject(this, Toothpick.openScope(DI.APP_SCOPE))
 
