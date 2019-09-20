@@ -82,6 +82,9 @@ dependencies {
 	val glideVersion = "4.9.0"
 	val toothpickVersion = "3.0.2"
 
+	// Bluetooth
+	implementation("com.akexorcist:bluetoothspp:1.0.0")
+
 	// Support
 	implementation("androidx.appcompat:appcompat:1.1.0")
 	implementation("com.google.android.material:material:1.1.0-alpha10")
@@ -113,17 +116,6 @@ dependencies {
 	implementation("io.reactivex.rxjava2:rxandroid:2.1.1")
 	implementation("io.reactivex.rxjava2:rxjava:2.2.6")
 	implementation("com.jakewharton.rxrelay2:rxrelay:2.1.0")
-
-	// Retrofit
-	implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")
-	implementation("com.squareup.retrofit2:converter-gson:$retrofitVersion")
-	implementation("com.squareup.okhttp3:logging-interceptor:3.11.0")
-	implementation("com.squareup.retrofit2:adapter-rxjava2:$retrofitVersion")
-
-	// Image load and cache
-	implementation("com.github.bumptech.glide:glide:$glideVersion")
-	kapt("com.github.bumptech.glide:compiler:$glideVersion")
-	implementation("com.github.bumptech.glide:okhttp3-integration:$glideVersion")
 
 	// Date
 	implementation("com.jakewharton.threetenabp:threetenabp:1.2.1")
