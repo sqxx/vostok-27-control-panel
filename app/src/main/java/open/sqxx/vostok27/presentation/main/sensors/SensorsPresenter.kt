@@ -6,10 +6,10 @@ import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
 import open.sqxx.vostok27.model.repository.BluetoothFront
 
-@ExperimentalUnsignedTypes
 @SuppressLint("CheckResult")
+@ExperimentalUnsignedTypes
 @InjectViewState
-class SensorsPresenter(val btFront: BluetoothFront) : MvpPresenter<SensorsView>() {
+class SensorsPresenter(private val btFront: BluetoothFront) : MvpPresenter<SensorsView>() {
 
 	companion object {
 
@@ -82,6 +82,9 @@ class SensorsPresenter(val btFront: BluetoothFront) : MvpPresenter<SensorsView>(
 			}
 			PROTOCOL_VAL_TMP -> {
 				viewState.showTemp(value)
+			}
+			PROTOCOL_VAL_PRS -> {
+				viewState.showPressure(value / 1000f)
 			}
 			else -> {
 				//todo handle unknown command answer

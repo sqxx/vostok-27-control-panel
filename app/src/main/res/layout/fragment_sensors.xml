@@ -44,6 +44,14 @@
                 app:unit="%"
                 app:value="0" />
 
+            <open.sqxx.vostok27.ui.main.view.SensorValueView
+                android:id="@+id/pres_sensor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:label="Давление"
+                app:unit="Бар"
+                app:value="0" />
+
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

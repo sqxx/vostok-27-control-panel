@@ -44,7 +44,7 @@ class SensorsFragment(val btFront: BluetoothFront) : BaseFragment(), SensorsView
 		hum_sensor.setValue(value.toString())
 	}
 
-	override fun showPressure(value: Int) {
-		TODO("not implemented")
+	override fun showPressure(value: Float) {
+		pres_sensor.setValue(String.format("%.2f", value))
 	}
 }
