@@ -8,6 +8,7 @@ import open.sqxx.vostok27.di.CacheLifetime
 import open.sqxx.vostok27.di.DefaultPageSize
 import open.sqxx.vostok27.di.PrimitiveWrapper
 import open.sqxx.vostok27.entity.app.develop.AppInfo
+import open.sqxx.vostok27.model.repository.BluetoothFront
 import open.sqxx.vostok27.model.repository.tools.Base64Tools
 import open.sqxx.vostok27.model.system.AppSchedulers
 import open.sqxx.vostok27.model.system.ResourceManager
@@ -38,6 +39,7 @@ class AppModule(context: Context) : Module() {
 		bind(SystemMessageNotifier::class.java).toInstance(SystemMessageNotifier())
 
 		bind(BluetoothSPP::class.java).toInstance(BluetoothSPP(context))
+		bind(BluetoothFront::class.java).toInstance(BluetoothFront())
 
 		// Navigation
 		Cicerone.create().apply {
@@ -56,8 +58,5 @@ class AppModule(context: Context) : Module() {
 				BuildConfig.FEEDBACK_URL
 			)
 		)
-
-		// Bluetooth
-
 	}
 }
