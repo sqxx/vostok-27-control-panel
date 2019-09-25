@@ -35,8 +35,8 @@ class SensorValueView(
 
 		try {
 			setLabel(attributes.getString(R.styleable.SensorValueView_label)!!)
-			setValue(attributes.getString(R.styleable.SensorValueView_value)!!)
 			unit = attributes.getString(R.styleable.SensorValueView_unit)!!
+			setValue(attributes.getString(R.styleable.SensorValueView_value)!!)
 		} finally {
 			attributes.recycle()
 		}
