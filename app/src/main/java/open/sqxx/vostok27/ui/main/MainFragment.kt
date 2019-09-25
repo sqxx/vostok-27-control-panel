@@ -6,10 +6,11 @@ import kotlinx.android.synthetic.main.fragment_main.*
 import open.sqxx.vostok27.R
 import open.sqxx.vostok27.Screens
 import open.sqxx.vostok27.extension.color
+import open.sqxx.vostok27.model.repository.BluetoothFront
 import open.sqxx.vostok27.ui.global.BaseFragment
 import ru.terrakok.cicerone.android.support.SupportAppScreen
 
-class MainFragment : BaseFragment() {
+class MainFragment(btFront: BluetoothFront) : BaseFragment() {
 
 	companion object {
 		private val sensorsTab = Screens.Sensors
@@ -24,6 +25,10 @@ class MainFragment : BaseFragment() {
 
 	private val currentTabFragment: BaseFragment?
 		get() = childFragmentManager.fragments.firstOrNull { !it.isHidden } as? BaseFragment
+
+	init {
+		sensorsTab.bluetoothFront = btFront
+	}
 
 	override fun onActivityCreated(savedInstanceState: Bundle?) {
 		super.onActivityCreated(savedInstanceState)

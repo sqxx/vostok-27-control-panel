@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import com.arellomobile.mvp.MvpAppCompatFragment
 import open.sqxx.vostok27.di.DI
 import open.sqxx.vostok27.extension.objectScopeName
+import open.sqxx.vostok27.ui.MainActivity
 import timber.log.Timber
 import toothpick.Scope
 import toothpick.Toothpick
@@ -20,6 +21,9 @@ abstract class BaseFragment : MvpAppCompatFragment() {
 	private var instanceStateSaved: Boolean = false
 
 	private val viewHandler = Handler()
+
+	protected open val parentActivty: MainActivity
+		get() = activity as MainActivity
 
 	protected open val parentScopeName: String by lazy {
 		(parentFragment as? BaseFragment)?.fragmentScopeName
