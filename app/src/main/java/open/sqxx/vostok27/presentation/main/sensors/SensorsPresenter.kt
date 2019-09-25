@@ -12,18 +12,26 @@ import open.sqxx.vostok27.model.repository.BluetoothFront
 class SensorsPresenter(val btFront: BluetoothFront) : MvpPresenter<SensorsView>() {
 
 	companion object {
-		private const val COMMAND_LEN = 5
-		private const val MAGIC_BYTE: Byte = 0xF4.toByte()
-		private const val REQST_BYTE: Byte = 0xFF.toByte()
 
-		private const val CMD_CO2_VALUE: Byte = 0xA1.toByte()
-		private const val CMD_HUM_VALUE: Byte = 0xA2.toByte()
-		private const val CMD_TEMP_VALUE: Byte = 0xA3.toByte()
+		private const val COMMAND_LEN = 5
+
+		private const val MAGIC_BYTE = 0xF4.toByte()
+		private const val DUMMY_BYTE = 0xFF.toByte()
+
+		private const val PROTOCOL_STARTUP = 0x01.toByte()
+		private const val PROTOCOL_INIT_COMPLETE = 0x02.toByte()
+		private const val PROTOCOL_NOT_READY = 0x03.toByte()
+
+		private const val PROTOCOL_VAL_CO2 = 0xA1.toByte()
+		private const val PROTOCOL_VAL_HUM = 0xA2.toByte()
+		private const val PROTOCOL_VAL_TMP = 0xA3.toByte()
+		private const val PROTOCOL_VAL_PRS = 0xA4.toByte()
 
 		val COMMANDS = byteArrayOf(
-			CMD_CO2_VALUE,
-			CMD_HUM_VALUE,
-			CMD_TEMP_VALUE
+			PROTOCOL_VAL_CO2,
+			PROTOCOL_VAL_HUM,
+			PROTOCOL_VAL_TMP,
+			PROTOCOL_VAL_PRS
 		)
 	}
 
@@ -66,13 +74,13 @@ class SensorsPresenter(val btFront: BluetoothFront) : MvpPresenter<SensorsView>(
 		val value: Int = highByte.shl(8) or lowByte
 
 		when (command) {
-			CMD_CO2_VALUE -> {
+			PROTOCOL_VAL_CO2 -> {
 				viewState.showCO2(value)
 			}
-			CMD_HUM_VALUE -> {
+			PROTOCOL_VAL_HUM -> {
 				viewState.showHumidity(value)
 			}
-			CMD_TEMP_VALUE -> {
+			PROTOCOL_VAL_TMP -> {
 				viewState.showTemp(value)
 			}
 			else -> {
@@ -96,8 +104,8 @@ class SensorsPresenter(val btFront: BluetoothFront) : MvpPresenter<SensorsView>(
 		val d = byteArrayOf(
 			MAGIC_BYTE,
 			command,
-			REQST_BYTE,
-			REQST_BYTE,
+			DUMMY_BYTE,
+			DUMMY_BYTE,
 			0x00
 		)
 
