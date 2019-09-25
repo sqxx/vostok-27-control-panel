@@ -4,7 +4,10 @@ import android.annotation.SuppressLint
 import app.akexorcist.bluetotohspp.library.BluetoothState
 import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
+import open.sqxx.vostok27.extension.rx.Variable
 import open.sqxx.vostok27.model.repository.BluetoothFront
+
+//todo Remove hardcoded strings
 
 @SuppressLint("CheckResult")
 @ExperimentalUnsignedTypes
@@ -35,29 +38,54 @@ class SensorsPresenter(private val btFront: BluetoothFront) : MvpPresenter<Senso
 		)
 	}
 
-	init {
-		btFront.receiver.observable.subscribe {
-			if (it.size != COMMAND_LEN) return@subscribe
+	private val btReady = Variable(false)
 
-			//todo Handle error messages from arduino
+	init {
+		btReady.observable.subscribe {
+			if (it) {
+				viewState.removeMessage()
+			} else {
+				viewState.showMessage("Ожидание Bluetooth устройства")
+			}
+		}
+
+		btFront.receiver.observable.subscribe {
+
+			if (it.isEmpty())
+				return@subscribe
+
+			if (it.size != COMMAND_LEN) {
+				try {
+					viewState.showMessage(String(it))
+				} catch (e: Exception) {
+					return@subscribe
+				}
+			}
+
 			handleData(it)
 		}
 
 		btFront.status.observable.subscribe {
 			if (it == BluetoothState.STATE_CONNECTED) {
 				requestAllSensorsData()
+			} else {
+				viewState.showMessage("Ожидание Bluetooth устройства")
 			}
 		}
 	}
 
 	private fun handleData(data: ByteArray) {
 		if (data.first() != MAGIC_BYTE) {
-			//todo handle magic byte error
+			viewState.showMessage("Пакет повреждён")
 			return
 		}
 
-		if (data.last() != calculateCrc(data)) {
-			//todo handle crc error
+		val crc = calculateCrc(data)
+		if (data.last() != crc) {
+			viewState.showMessage(
+				"Несовпадает контрольная сумма\n" +
+					"${data.last().toUByte()} получено, ожидается $crc"
+			)
 			return
 		}
 
@@ -68,6 +96,15 @@ class SensorsPresenter(private val btFront: BluetoothFront) : MvpPresenter<Senso
 		 */
 
 		val command = data[1]
+
+		btReady.value =
+			(command != PROTOCOL_STARTUP &&
+				command != PROTOCOL_INIT_COMPLETE &&
+				command != PROTOCOL_NOT_READY)
+
+		if (!btReady.value) {
+			return
+		}
 
 		val lowByte = data[2].toUByte().toInt()
 		val highByte = data[3].toUByte().toInt()
@@ -84,14 +121,12 @@ class SensorsPresenter(private val btFront: BluetoothFront) : MvpPresenter<Senso
 				viewState.showTemp(value)
 			}
 			PROTOCOL_VAL_PRS -> {
+				// Преобразуем мБары в Бары
 				viewState.showPressure(value / 1000f)
-			}
-			else -> {
-				//todo handle unknown command answer
 			}
 		}
 
-		// Пул полностью реализован. Делаем следующие запросы
+		// Пул полностью обработан. Делаем следующие запросы
 		if (command == COMMANDS.last()) {
 			requestAllSensorsData()
 		}

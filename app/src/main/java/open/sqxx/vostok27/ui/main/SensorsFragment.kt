@@ -47,4 +47,12 @@ class SensorsFragment(val btFront: BluetoothFront) : BaseFragment(), SensorsView
 	override fun showPressure(value: Float) {
 		pres_sensor.setValue(String.format("%.2f", value))
 	}
+
+	override fun showMessage(msg: String) {
+		message.text = msg
+	}
+
+	override fun removeMessage() {
+		message.text = ""
+	}
 }
