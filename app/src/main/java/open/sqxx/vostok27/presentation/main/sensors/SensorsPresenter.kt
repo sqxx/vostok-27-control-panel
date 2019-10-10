@@ -1,60 +1,22 @@
 package open.sqxx.vostok27.presentation.main.sensors
 
 import android.annotation.SuppressLint
-import app.akexorcist.bluetotohspp.library.BluetoothState
 import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
-import open.sqxx.vostok27.extension.rx.Variable
 import open.sqxx.vostok27.model.repository.BluetoothFront
-
-//todo Remove hardcoded strings
+import open.sqxx.vostok27.model.repository.BluetoothModel
 
 @SuppressLint("CheckResult")
 @ExperimentalUnsignedTypes
 @InjectViewState
 class SensorsPresenter(private val btFront: BluetoothFront) : MvpPresenter<SensorsView>() {
 
-	companion object {
-
-		private const val COMMAND_LEN = 5
-
-		private const val MAGIC_BYTE = 0xF4.toByte()
-		private const val DUMMY_BYTE = 0xFF.toByte()
-
-		private const val PROTOCOL_STARTUP = 0x01.toByte()
-		private const val PROTOCOL_INIT_COMPLETE = 0x02.toByte()
-		private const val PROTOCOL_NOT_READY = 0x03.toByte()
-
-		private const val PROTOCOL_VAL_CO2 = 0xA1.toByte()
-		private const val PROTOCOL_VAL_HUM = 0xA2.toByte()
-		private const val PROTOCOL_VAL_TMP = 0xA3.toByte()
-		private const val PROTOCOL_VAL_PRS = 0xA4.toByte()
-
-		val COMMANDS = byteArrayOf(
-			PROTOCOL_VAL_CO2,
-			PROTOCOL_VAL_HUM,
-			PROTOCOL_VAL_TMP,
-			PROTOCOL_VAL_PRS
-		)
-	}
-
-	private val btReady = Variable(false)
-
 	init {
-		btReady.observable.subscribe {
-			if (it) {
-				viewState.removeMessage()
-			} else {
-				viewState.showMessage("Ожидание Bluetooth устройства")
-			}
-		}
-
 		btFront.receiver.observable.subscribe {
-
 			if (it.isEmpty())
 				return@subscribe
 
-			if (it.size != COMMAND_LEN) {
+			if (it.size != BluetoothModel.PACKAGE_SIZE) {
 				try {
 					viewState.showMessage(String(it))
 				} catch (e: Exception) {
@@ -66,99 +28,55 @@ class SensorsPresenter(private val btFront: BluetoothFront) : MvpPresenter<Senso
 		}
 
 		btFront.status.observable.subscribe {
-			if (it == BluetoothState.STATE_CONNECTED) {
-				requestAllSensorsData()
-			} else {
-				viewState.showMessage("Ожидание Bluetooth устройства")
-			}
+			requestAllSensorsData()
 		}
 	}
 
 	private fun handleData(data: ByteArray) {
-		if (data.first() != MAGIC_BYTE) {
+		if (data.first() != BluetoothModel.MAGIC_BYTE) {
 			viewState.showMessage("Пакет повреждён")
 			return
 		}
 
-		val crc = calculateCrc(data)
-		if (data.last() != crc) {
+		val givenCRC = BluetoothModel.extractCrc(data)
+		val calcCRC = BluetoothModel.calculateCrc(data)
+
+		if (givenCRC != calcCRC) {
 			viewState.showMessage(
 				"Несовпадает контрольная сумма\n" +
-					"${data.last().toUByte()} получено, ожидается $crc"
+					"$givenCRC получено, ожидается $calcCRC"
 			)
 			return
 		}
 
-		/*
-		 * Конвертация в UByte необходима!
-		 * Иначе при конвертации в Int сохраняется знак типа Byte,
-		 * что ведёт к потере оригинальных данных
-		 */
-
 		val command = data[1]
-
-		btReady.value =
-			(command != PROTOCOL_STARTUP &&
-				command != PROTOCOL_INIT_COMPLETE &&
-				command != PROTOCOL_NOT_READY)
-
-		if (!btReady.value) {
-			return
-		}
-
-		val lowByte = data[2].toUByte().toInt()
-		val highByte = data[3].toUByte().toInt()
-		val value: Int = highByte.shl(8) or lowByte
+		val value = BluetoothModel.extractValue(data)
 
 		when (command) {
-			PROTOCOL_VAL_CO2 -> {
+			BluetoothModel._P_REQ_CO2 -> {
 				viewState.showCO2(value)
 			}
-			PROTOCOL_VAL_HUM -> {
+			BluetoothModel._P_REQ_HUM -> {
 				viewState.showHumidity(value)
 			}
-			PROTOCOL_VAL_TMP -> {
+			BluetoothModel._P_REQ_TEMP -> {
 				viewState.showTemp(value)
 			}
-			PROTOCOL_VAL_PRS -> {
+			BluetoothModel._P_REQ_PRES -> {
 				// Преобразуем мБары в Бары
 				viewState.showPressure(value / 1000f)
 			}
 		}
 
 		// Пул полностью обработан. Делаем следующие запросы
-		if (command == COMMANDS.last()) {
+		if (command == BluetoothModel.VALUES_COMMANDS.last()) {
 			requestAllSensorsData()
 		}
 	}
 
 	private fun requestAllSensorsData() {
-		COMMANDS.forEach {
-			requestData(it)
+		BluetoothModel.VALUES_COMMANDS.forEach {
+			BluetoothModel.requestData(btFront, it)
 		}
-	}
-
-	private fun requestData(command: Byte) {
-		val d = byteArrayOf(
-			MAGIC_BYTE,
-			command,
-			DUMMY_BYTE,
-			DUMMY_BYTE,
-			0x00
-		)
-
-		d[COMMAND_LEN - 1] = calculateCrc(d)
-
-		btFront.sender.value = d
-	}
-
-	private fun calculateCrc(cmd: ByteArray): Byte {
-		var crc: Byte = 0x00
-
-		for (i in 1..cmd.size - 2) {
-			crc = crc.plus(cmd[i]).toByte()
-		}
-
-		return crc
 	}
 }

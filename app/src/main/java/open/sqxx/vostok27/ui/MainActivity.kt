@@ -1,6 +1,5 @@
 package open.sqxx.vostok27.ui
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
@@ -17,6 +16,8 @@ import io.reactivex.disposables.Disposable
 import open.sqxx.vostok27.R
 import open.sqxx.vostok27.di.DI
 import open.sqxx.vostok27.model.repository.BluetoothFront
+import open.sqxx.vostok27.model.repository.BluetoothModel
+import open.sqxx.vostok27.model.repository.BluetoothStatus
 import open.sqxx.vostok27.model.system.message.SystemMessage
 import open.sqxx.vostok27.model.system.message.SystemMessageNotifier
 import open.sqxx.vostok27.model.system.message.SystemMessageType
@@ -30,7 +31,10 @@ import ru.terrakok.cicerone.commands.Command
 import toothpick.Toothpick
 import javax.inject.Inject
 
+@ExperimentalUnsignedTypes
 class MainActivity : MvpAppCompatActivity() {
+
+	//region Данные
 
 	@Inject
 	lateinit var appLauncher: AppLauncher
@@ -67,7 +71,11 @@ class MainActivity : MvpAppCompatActivity() {
 			}
 		}
 
-	public override fun onStart() {
+	//endregion
+
+	//region Жизненный цикл
+
+	override fun onStart() {
 		super.onStart()
 		if (!bt.isBluetoothEnabled) {
 			enableBluetooth()
@@ -108,12 +116,6 @@ class MainActivity : MvpAppCompatActivity() {
 		handleBluetooth()
 	}
 
-	override fun onResumeFragments() {
-		super.onResumeFragments()
-		subscribeOnSystemMessages()
-		navigatorHolder.setNavigator(navigator)
-	}
-
 	override fun onPause() {
 		navigatorHolder.removeNavigator()
 		unsubscribeOnSystemMessages()
@@ -124,6 +126,44 @@ class MainActivity : MvpAppCompatActivity() {
 		super.onDestroy()
 		bt.stopService()
 	}
+
+	override fun onResumeFragments() {
+		super.onResumeFragments()
+		subscribeOnSystemMessages()
+		navigatorHolder.setNavigator(navigator)
+	}
+
+	//endregion
+
+	//region Система событий
+
+	private fun subscribeOnSystemMessages() {
+		notifierDisposable = systemMessageNotifier.notifier
+			.subscribe { msg ->
+				when (msg.type) {
+					SystemMessageType.ALERT -> showAlertMessage(msg.text)
+					SystemMessageType.TOAST -> showToastMessage(msg.text)
+				}
+			}
+	}
+
+	private fun unsubscribeOnSystemMessages() {
+		notifierDisposable?.dispose()
+	}
+
+	private fun showAlertMessage(message: String) {
+		MessageDialogFragment.create(
+			message = message
+		).show(supportFragmentManager, null)
+	}
+
+	private fun showToastMessage(message: String) {
+		Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+	}
+
+	//endregion
+
+	//region Внешние события
 
 	override fun onBackPressed() {
 		currentFragment?.onBackPressed() ?: super.onBackPressed()
@@ -153,34 +193,12 @@ class MainActivity : MvpAppCompatActivity() {
 		super.onActivityResult(requestCode, resultCode, data)
 	}
 
+	//endregion
+
 	private fun setup() {
 		if (savedInstanceState == null) {
 			appLauncher.coldStart(bluetoothFront)
 		}
-	}
-
-	private fun showAlertMessage(message: String) {
-		MessageDialogFragment.create(
-			message = message
-		).show(supportFragmentManager, null)
-	}
-
-	private fun showToastMessage(message: String) {
-		Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-	}
-
-	private fun subscribeOnSystemMessages() {
-		notifierDisposable = systemMessageNotifier.notifier
-			.subscribe { msg ->
-				when (msg.type) {
-					SystemMessageType.ALERT -> showAlertMessage(msg.text)
-					SystemMessageType.TOAST -> showToastMessage(msg.text)
-				}
-			}
-	}
-
-	private fun unsubscribeOnSystemMessages() {
-		notifierDisposable?.dispose()
 	}
 
 	private fun enableBluetooth() {
@@ -189,7 +207,6 @@ class MainActivity : MvpAppCompatActivity() {
 	}
 
 	private fun selectBluetoothDevice() {
-
 		if (bt.serviceState == BluetoothState.STATE_CONNECTED)
 			bt.disconnect()
 
@@ -199,20 +216,33 @@ class MainActivity : MvpAppCompatActivity() {
 		startActivityForResult(intent, BluetoothState.REQUEST_CONNECT_DEVICE)
 	}
 
-	@SuppressLint("CheckResult")
 	private fun handleBluetooth() {
-		bt.setOnDataReceivedListener { data, message ->
-			bluetoothFront.receiver.value = data
+		bt.setOnDataReceivedListener { data, _ ->
+			if (data.isEmpty()) return@setOnDataReceivedListener
+
+			if (data[1] == BluetoothModel._P_STARTUP ||
+				data[1] == BluetoothModel._P_INIT_COMPLETE ||
+				data[1] == BluetoothModel._P_NOT_READY
+			) {
+				bluetoothFront.status.value = BluetoothStatus.WAIT_FOR_READY
+				//todo: Добавить диалог прогресса
+			} else {
+				if (bluetoothFront.status.value != BluetoothStatus.READY) {
+					bluetoothFront.status.value = BluetoothStatus.READY
+				}
+
+				bluetoothFront.receiver.value = data
+			}
 		}
 
 		bt.setBluetoothConnectionListener(object : BluetoothSPP.BluetoothConnectionListener {
 			override fun onDeviceDisconnected() {
-				bluetoothFront.status.value = BluetoothState.STATE_NONE
+				bluetoothFront.status.value = BluetoothStatus.NONE
 
 				systemMessageNotifier.send(
 					SystemMessage(
-						"Bluetooth device disconnected",
-						SystemMessageType.ALERT
+						"Bluetooth устройство отключилось",
+						SystemMessageType.TOAST
 					)
 				)
 
@@ -220,20 +250,15 @@ class MainActivity : MvpAppCompatActivity() {
 			}
 
 			override fun onDeviceConnectionFailed() {
-				bluetoothFront.status.value = BluetoothState.STATE_NONE
+				bluetoothFront.status.value = BluetoothStatus.NONE
 
-				systemMessageNotifier.send(
-					SystemMessage(
-						"Bluetooth device connection failed",
-						SystemMessageType.ALERT
-					)
-				)
+				//todo: Показать сообщение об ошибке
 
 				selectBluetoothDevice()
 			}
 
 			override fun onDeviceConnected(name: String, address: String) {
-				bluetoothFront.status.value = BluetoothState.STATE_CONNECTED
+				bluetoothFront.status.value = BluetoothStatus.CONNECTED
 			}
 		})
 
@@ -244,7 +269,7 @@ class MainActivity : MvpAppCompatActivity() {
 				}
 
 				override fun onNext(s: ByteArray) {
-					if (s.size != 5) return
+					if (s.size != BluetoothModel.PACKAGE_SIZE) return
 					bt.send(s, false)
 				}
 
