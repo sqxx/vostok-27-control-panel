@@ -27,7 +27,12 @@ class MainFragment(btFront: BluetoothFront) : BaseFragment() {
 		get() = childFragmentManager.fragments.firstOrNull { !it.isHidden } as? BaseFragment
 
 	init {
-		sensorsTab.bluetoothFront = btFront
+		btFront.let {
+			sensorsTab.bluetoothFront = btFront
+			chartTab.bluetoothFront = btFront
+			switchersTab.bluetoothFront = btFront
+			optionsTab.bluetoothFront = btFront
+		}
 	}
 
 	override fun onActivityCreated(savedInstanceState: Bundle?) {
