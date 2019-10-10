@@ -8,25 +8,26 @@ object Screens {
 
 	object Main : SupportAppScreen() {
 		lateinit var bluetoothFront: BluetoothFront
-
 		override fun getFragment() = MainFragment(bluetoothFront)
 	}
 
 	object Sensors : SupportAppScreen() {
 		lateinit var bluetoothFront: BluetoothFront
-
 		override fun getFragment() = SensorsFragment(bluetoothFront)
 	}
 
 	object Chart : SupportAppScreen() {
-		override fun getFragment() = ChartFragment()
+		lateinit var bluetoothFront: BluetoothFront
+		override fun getFragment() = ChartFragment(bluetoothFront)
 	}
 
 	object Switchers : SupportAppScreen() {
-		override fun getFragment() = SwitchersFragment()
+		lateinit var bluetoothFront: BluetoothFront
+		override fun getFragment() = SwitchersFragment(bluetoothFront)
 	}
 
 	object Options : SupportAppScreen() {
-		override fun getFragment() = OptionsFragment()
+		lateinit var bluetoothFront: BluetoothFront
+		override fun getFragment() = OptionsFragment(bluetoothFront)
 	}
 }
