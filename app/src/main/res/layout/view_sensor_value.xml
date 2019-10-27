@@ -1,7 +1,6 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="246dp"
         android:layout_height="wrap_content"

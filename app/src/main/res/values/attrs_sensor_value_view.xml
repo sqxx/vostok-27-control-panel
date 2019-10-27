@@ -1,9 +1,7 @@
 <resources>
     <declare-styleable name="SensorValueView">
-
-        <attr name="label" format="string" />
-        <attr name="value" format="string" />
-        <attr name="unit" format="string" />
-
+        <attr name="label" />
+        <attr name="value" />
+        <attr name="unit" />
     </declare-styleable>
 </resources>

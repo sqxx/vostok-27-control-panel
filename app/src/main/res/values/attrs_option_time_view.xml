@@ -1,0 +1,6 @@
+<resources>
+    <declare-styleable name="OptionTimeView">
+        <attr name="title" />
+        <attr name="value" />
+    </declare-styleable>
+</resources>
