@@ -5,6 +5,7 @@ import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
 import open.sqxx.vostok27.model.repository.BluetoothFront
 import open.sqxx.vostok27.model.repository.BluetoothModel
+import timber.log.Timber
 
 @SuppressLint("CheckResult")
 @ExperimentalUnsignedTypes
@@ -16,14 +17,6 @@ class SensorsPresenter(private val btFront: BluetoothFront) : MvpPresenter<Senso
 			if (it.isEmpty())
 				return@subscribe
 
-			if (it.size != BluetoothModel.PACKAGE_SIZE) {
-				try {
-					viewState.showMessage(String(it))
-				} catch (e: Exception) {
-					return@subscribe
-				}
-			}
-
 			handleData(it)
 		}
 
@@ -33,9 +26,9 @@ class SensorsPresenter(private val btFront: BluetoothFront) : MvpPresenter<Senso
 	}
 
 	private fun handleData(data: ByteArray) {
-		if (data.first() != BluetoothModel.MAGIC_BYTE) {
-			viewState.showMessage("Пакет повреждён")
-			return
+		if (data.first() != BluetoothModel.START_MAGIC) {
+			viewState.showMessage("Несовпадение магического числа")
+			requestReset()
 		}
 
 		val givenCRC = BluetoothModel.extractCrc(data)
@@ -46,7 +39,7 @@ class SensorsPresenter(private val btFront: BluetoothFront) : MvpPresenter<Senso
 				"Несовпадает контрольная сумма\n" +
 					"$givenCRC получено, ожидается $calcCRC"
 			)
-			return
+			requestReset()
 		}
 
 		val command = data[1]
@@ -66,12 +59,24 @@ class SensorsPresenter(private val btFront: BluetoothFront) : MvpPresenter<Senso
 				// Преобразуем мБары в Бары
 				viewState.showPressure(value / 1000f)
 			}
+			BluetoothModel._PE_PACKAGE_ERR -> {
+				Timber.tag("VOSTOK-27").e("_PE_PACKAGE_ERR")
+				requestAllSensorsData()
+			}
+			BluetoothModel._PE_PACKAGE_CRC -> {
+				Timber.tag("VOSTOK-27").e("_PE_PACKAGE_CRC")
+				requestAllSensorsData()
+			}
 		}
 
 		// Пул полностью обработан. Делаем следующие запросы
 		if (command == BluetoothModel.VALUES_COMMANDS.last()) {
 			requestAllSensorsData()
 		}
+	}
+
+	private fun requestReset() {
+		BluetoothModel.requestData(btFront, BluetoothModel._P_SERIAL_RESET)
 	}
 
 	private fun requestAllSensorsData() {

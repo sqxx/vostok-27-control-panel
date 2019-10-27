@@ -270,7 +270,7 @@ class MainActivity : MvpAppCompatActivity() {
 
 				override fun onNext(s: ByteArray) {
 					if (s.size != BluetoothModel.PACKAGE_SIZE) return
-					bt.send(s, false)
+					bt.send(s, true)
 				}
 
 				override fun onError(e: Throwable) {
