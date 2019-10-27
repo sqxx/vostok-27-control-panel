@@ -28,10 +28,10 @@ class MainFragment(btFront: BluetoothFront) : BaseFragment() {
 
 	init {
 		btFront.let {
-			sensorsTab.bluetoothFront = btFront
-			chartTab.bluetoothFront = btFront
-			switchersTab.bluetoothFront = btFront
-			optionsTab.bluetoothFront = btFront
+			sensorsTab.bluetoothFront = it
+			chartTab.bluetoothFront = it
+			switchersTab.bluetoothFront = it
+			optionsTab.bluetoothFront = it
 		}
 	}
 
