@@ -28,7 +28,10 @@ class SensorsPresenter(private val btFront: BluetoothFront) : MvpPresenter<Senso
 	private fun handleData(data: ByteArray) {
 		if (data.first() != BluetoothModel.START_MAGIC) {
 			viewState.showMessage("Несовпадение магического числа")
+
 			requestReset()
+			requestAllSensorsData()
+			return
 		}
 
 		val givenCRC = BluetoothModel.extractCrc(data)
@@ -39,7 +42,10 @@ class SensorsPresenter(private val btFront: BluetoothFront) : MvpPresenter<Senso
 				"Несовпадает контрольная сумма\n" +
 					"$givenCRC получено, ожидается $calcCRC"
 			)
+
 			requestReset()
+			requestAllSensorsData()
+			return
 		}
 
 		val command = data[1]
