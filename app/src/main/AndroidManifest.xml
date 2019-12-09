@@ -15,7 +15,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.Splash"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
-        <activity android:name="open.sqxx.vostok27.ui.MainActivity">
+        <activity
+            android:name="open.sqxx.vostok27.ui.MainActivity"
+            android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
