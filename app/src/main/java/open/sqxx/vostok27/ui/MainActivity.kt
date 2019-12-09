@@ -220,9 +220,13 @@ class MainActivity : MvpAppCompatActivity() {
 		bt.setOnDataReceivedListener { data, _ ->
 			if (data.isEmpty()) return@setOnDataReceivedListener
 
-			if (data[1] == BluetoothModel._P_STARTUP ||
-				data[1] == BluetoothModel._P_INIT_COMPLETE ||
-				data[1] == BluetoothModel._P_NOT_READY
+			val d = data.toUByteArray()
+
+			val cmd = d[1]
+
+			if (cmd == BluetoothModel._P_STARTUP ||
+				cmd == BluetoothModel._P_INIT_COMPLETE ||
+				cmd == BluetoothModel._P_NOT_READY
 			) {
 				bluetoothFront.status.value = BluetoothStatus.WAIT_FOR_READY
 				//todo: Добавить диалог прогресса
@@ -231,7 +235,7 @@ class MainActivity : MvpAppCompatActivity() {
 					bluetoothFront.status.value = BluetoothStatus.READY
 				}
 
-				bluetoothFront.receiver.value = data
+				bluetoothFront.receiver.value = d
 			}
 		}
 
@@ -263,14 +267,14 @@ class MainActivity : MvpAppCompatActivity() {
 		})
 
 		bluetoothFront.sender.observable.subscribe(
-			object : Observer<ByteArray> {
+			object : Observer<UByteArray> {
 				override fun onSubscribe(d: Disposable) {
 					//unused
 				}
 
-				override fun onNext(s: ByteArray) {
+				override fun onNext(s: UByteArray) {
 					if (s.size != BluetoothModel.PACKAGE_SIZE) return
-					bt.send(s, true)
+					bt.send(s.toByteArray(), true)
 				}
 
 				override fun onError(e: Throwable) {

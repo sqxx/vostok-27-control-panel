@@ -34,7 +34,7 @@ class OptionStateView(
 	}
 
 	private fun setDescription(description: String) {
-		layout.description.text = description
+		//layout.description.text = description
 	}
 
 	fun setState(state: Boolean) {

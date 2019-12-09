@@ -1,93 +1,67 @@
 package open.sqxx.vostok27.presentation.main.sensors
 
-import android.annotation.SuppressLint
 import com.arellomobile.mvp.InjectViewState
-import com.arellomobile.mvp.MvpPresenter
 import open.sqxx.vostok27.model.repository.BluetoothFront
 import open.sqxx.vostok27.model.repository.BluetoothModel
-import timber.log.Timber
+import open.sqxx.vostok27.presentation.main.BluetoothFragmentPresenter
 
-@SuppressLint("CheckResult")
 @ExperimentalUnsignedTypes
 @InjectViewState
-class SensorsPresenter(private val btFront: BluetoothFront) : MvpPresenter<SensorsView>() {
+class SensorsPresenter(btFront: BluetoothFront) :
+	BluetoothFragmentPresenter<SensorsView>(btFront) {
 
-	init {
-		btFront.receiver.observable.subscribe {
-			if (it.isEmpty())
-				return@subscribe
+	override fun handleData(data: UByteArray) {
+		BluetoothModel.let {
 
-			handleData(it)
-		}
+			val command = data[1]
 
-		btFront.status.observable.subscribe {
-			requestAllSensorsData()
-		}
-	}
+			// Обработка команды сброса
+			// После отправки reset будут ещё некоторое время приходить битые пакеты
+			it.handleReset(btFront, data)
+			if (it.isResetRequested())
+				return
 
-	private fun handleData(data: ByteArray) {
-		if (data.first() != BluetoothModel.START_MAGIC) {
-			viewState.showMessage("Несовпадение магического числа")
+			val status = it.checkPackage(data)
 
-			requestReset()
-			requestAllSensorsData()
-			return
-		}
-
-		val givenCRC = BluetoothModel.extractCrc(data)
-		val calcCRC = BluetoothModel.calculateCrc(data)
-
-		if (givenCRC != calcCRC) {
-			viewState.showMessage(
-				"Несовпадает контрольная сумма\n" +
-					"$givenCRC получено, ожидается $calcCRC"
-			)
-
-			requestReset()
-			requestAllSensorsData()
-			return
-		}
-
-		val command = data[1]
-		val value = BluetoothModel.extractValue(data)
-
-		when (command) {
-			BluetoothModel._P_REQ_CO2 -> {
-				viewState.showCO2(value)
+			// Обработка несоответствия магического числа
+			if (it.handleMagicByteError(btFront, status)) {
+				viewState.showMessage("Несовпадение магического числа")
+				return
 			}
-			BluetoothModel._P_REQ_HUM -> {
-				viewState.showHumidity(value)
-			}
-			BluetoothModel._P_REQ_TEMP -> {
-				viewState.showTemp(value)
-			}
-			BluetoothModel._P_REQ_PRES -> {
-				// Преобразуем мБары в Бары
-				viewState.showPressure(value / 1000f)
-			}
-			BluetoothModel._PE_PACKAGE_ERR -> {
-				Timber.tag("VOSTOK-27").e("_PE_PACKAGE_ERR")
-				requestAllSensorsData()
-			}
-			BluetoothModel._PE_PACKAGE_CRC -> {
-				Timber.tag("VOSTOK-27").e("_PE_PACKAGE_CRC")
-				requestAllSensorsData()
-			}
-		}
 
-		// Пул полностью обработан. Делаем следующие запросы
-		if (command == BluetoothModel.VALUES_COMMANDS.last()) {
-			requestAllSensorsData()
-		}
-	}
+			// Обработка несоответствия контрольной суммы
+			if (it.handleCRCError(btFront, status)) {
+				viewState.showMessage("Несовпадение контрольной суммы")
+				return
+			}
 
-	private fun requestReset() {
-		BluetoothModel.requestData(btFront, BluetoothModel._P_SERIAL_RESET)
-	}
+			// Обработка исключений по протоколу
+			if (it.handleProtocolExceptions(btFront, data)) {
+				viewState.showMessage("Ошибки на стороне slave")
+				return
+			}
 
-	private fun requestAllSensorsData() {
-		BluetoothModel.VALUES_COMMANDS.forEach {
-			BluetoothModel.requestData(btFront, it)
+			// Обработка ответов
+			val value = it.extractValue(data)
+			when (command) {
+				it._P_REQ_CO2 -> {
+					viewState.showCO2(value.toInt())
+				}
+				it._P_REQ_HUM -> {
+					viewState.showHumidity(value.toInt())
+				}
+				it._P_REQ_TEMP -> {
+					viewState.showTemp(value.toInt())
+				}
+				it._P_REQ_PRES -> {
+					// Преобразуем мБары в Бары
+					viewState.showPressure(value.toFloat() / 1000f)
+				}
+			}
+
+			// Пул полностью обработан
+			if (command == it.VALUES_COMMANDS.last())
+				it.requestAllSensorsData(btFront)
 		}
 	}
 }

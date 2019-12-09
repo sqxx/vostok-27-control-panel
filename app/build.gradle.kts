@@ -59,7 +59,8 @@ android {
 					file("proguard-rules.pro")
 				)
 			}
-			/*getByName("release") {
+			/*todo
+			getByName("release") {
 				isMinifyEnabled = true
 				signingConfig = signingConfigs.getByName("prod")
 
@@ -67,7 +68,8 @@ android {
 					getDefaultProguardFile("proguard-android-optimize.txt"),
 					file("proguard-rules.pro")
 				)
-			}*/
+			}
+			*/
 		}
 	}
 }
@@ -78,8 +80,6 @@ androidExtensions {
 
 dependencies {
 	val moxyVersion = "1.7.0"
-	val retrofitVersion = "2.6.1"
-	val glideVersion = "4.9.0"
 	val toothpickVersion = "3.0.2"
 
 	// Bluetooth
@@ -87,7 +87,7 @@ dependencies {
 
 	// Support
 	implementation("androidx.appcompat:appcompat:1.1.0")
-	implementation("com.google.android.material:material:1.1.0-alpha10")
+	implementation("com.google.android.material:material:1.2.0-alpha02")
 	implementation("androidx.cardview:cardview:1.0.0")
 	implementation("androidx.constraintlayout:constraintlayout:1.1.3")
 
@@ -119,6 +119,9 @@ dependencies {
 
 	// Date
 	implementation("com.jakewharton.threetenabp:threetenabp:1.2.1")
+
+	// Test
+	testImplementation("junit:junit:4.12")
 }
 
 configurations.all {

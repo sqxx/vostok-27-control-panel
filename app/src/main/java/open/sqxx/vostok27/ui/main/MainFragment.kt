@@ -10,6 +10,7 @@ import open.sqxx.vostok27.model.repository.BluetoothFront
 import open.sqxx.vostok27.ui.global.BaseFragment
 import ru.terrakok.cicerone.android.support.SupportAppScreen
 
+@ExperimentalUnsignedTypes
 class MainFragment(btFront: BluetoothFront) : BaseFragment() {
 
 	companion object {

@@ -4,6 +4,7 @@ import open.sqxx.vostok27.model.repository.BluetoothFront
 import open.sqxx.vostok27.ui.main.*
 import ru.terrakok.cicerone.android.support.SupportAppScreen
 
+@ExperimentalUnsignedTypes
 object Screens {
 
 	object Main : SupportAppScreen() {
