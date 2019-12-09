@@ -1,11 +1,11 @@
 package open.sqxx.vostok27.ui.main
 
 import android.os.Bundle
-import com.aurelhubert.ahbottomnavigation.AHBottomNavigationAdapter
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import kotlinx.android.synthetic.main.fragment_main.*
 import open.sqxx.vostok27.R
 import open.sqxx.vostok27.Screens
-import open.sqxx.vostok27.extension.color
 import open.sqxx.vostok27.model.repository.BluetoothFront
 import open.sqxx.vostok27.ui.global.BaseFragment
 import ru.terrakok.cicerone.android.support.SupportAppScreen
@@ -38,35 +38,33 @@ class MainFragment(btFront: BluetoothFront) : BaseFragment() {
 
 	override fun onActivityCreated(savedInstanceState: Bundle?) {
 		super.onActivityCreated(savedInstanceState)
-		setupBottomNavigation()
+		setupNavigation()
 	}
 
 	override fun onBackPressed() {
 		currentTabFragment?.onBackPressed()
 	}
 
-	private fun setupBottomNavigation() {
-		AHBottomNavigationAdapter(activity, R.menu.main_bottom_menu).apply {
-			setupWithBottomNavigation(bottomBar)
-		}
+	private fun setupNavigation() {
+		tabs.addOnTabSelectedListener(object : OnTabSelectedListener {
+			override fun onTabReselected(tab: TabLayout.Tab?) {}
 
-		with(bottomBar) {
-			accentColor = context.color(R.color.colorAccent)
-			inactiveColor = context.color(R.color.silver)
+			override fun onTabUnselected(tab: TabLayout.Tab?) {
+				//todo stop bluetooth presenter on selected tab
+			}
 
-			setOnTabSelectedListener { position, wasSelected ->
-				if (!wasSelected) selectTab(
-					when (position) {
+			override fun onTabSelected(tab: TabLayout.Tab?) {
+				selectTab(
+					when (tab!!.position) {
 						0 -> sensorsTab
-						1 -> chartTab
-						2 -> switchersTab
-						3 -> optionsTab
+						1 -> switchersTab
+						2 -> optionsTab
 						else -> defaultTab
 					}
 				)
-				true
 			}
-		}
+
+		})
 
 		selectTab(
 			when (currentTabFragment?.tag) {

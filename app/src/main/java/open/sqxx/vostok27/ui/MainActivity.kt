@@ -77,6 +77,8 @@ class MainActivity : MvpAppCompatActivity() {
 
 	override fun onStart() {
 		super.onStart()
+		appLauncher.coldStart(bluetoothFront)
+		return
 		if (!bt.isBluetoothEnabled) {
 			enableBluetooth()
 			selectBluetoothDevice()
