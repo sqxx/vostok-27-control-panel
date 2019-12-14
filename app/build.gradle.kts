@@ -82,6 +82,9 @@ dependencies {
 	val moxyVersion = "1.7.0"
 	val toothpickVersion = "3.0.2"
 
+	// Kotlin
+	implementation("org.jetbrains.kotlin:kotlin-stdlib:${extra["kotlinVersion"] as String}")
+
 	// Bluetooth
 	implementation("com.akexorcist:bluetoothspp:1.0.0")
 
@@ -92,10 +95,8 @@ dependencies {
 	implementation("androidx.constraintlayout:constraintlayout:1.1.3")
 
 	// Ui
-	implementation("com.aurelhubert:ahbottomnavigation:2.3.4")
-
-	// Kotlin
-	implementation("org.jetbrains.kotlin:kotlin-stdlib:${extra["kotlinVersion"] as String}")
+	implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+	implementation("net.cachapa.expandablelayout:expandablelayout:2.9.2")
 
 	// Log
 	implementation("com.jakewharton.timber:timber:4.7.0")
