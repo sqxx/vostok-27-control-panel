@@ -15,7 +15,6 @@ class MainFragment(btFront: BluetoothFront) : BaseFragment() {
 
 	companion object {
 		private val sensorsTab = Screens.Sensors
-		private val chartTab = Screens.Chart
 		private val switchersTab = Screens.Switchers
 		private val optionsTab = Screens.Options
 
@@ -30,7 +29,6 @@ class MainFragment(btFront: BluetoothFront) : BaseFragment() {
 	init {
 		btFront.let {
 			sensorsTab.bluetoothFront = it
-			chartTab.bluetoothFront = it
 			switchersTab.bluetoothFront = it
 			optionsTab.bluetoothFront = it
 		}
@@ -69,7 +67,6 @@ class MainFragment(btFront: BluetoothFront) : BaseFragment() {
 		selectTab(
 			when (currentTabFragment?.tag) {
 				sensorsTab.screenKey   -> sensorsTab
-				chartTab.screenKey     -> chartTab
 				switchersTab.screenKey -> switchersTab
 				optionsTab.screenKey   -> optionsTab
 				else                   -> defaultTab
