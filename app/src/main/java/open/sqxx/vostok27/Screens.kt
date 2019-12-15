@@ -17,11 +17,6 @@ object Screens {
 		override fun getFragment() = SensorsFragment(bluetoothFront)
 	}
 
-	object Chart : SupportAppScreen() {
-		lateinit var bluetoothFront: BluetoothFront
-		override fun getFragment() = ChartFragment(bluetoothFront)
-	}
-
 	object Switchers : SupportAppScreen() {
 		lateinit var bluetoothFront: BluetoothFront
 		override fun getFragment() = SwitchersFragment(bluetoothFront)
