@@ -84,6 +84,7 @@ dependencies {
 
 	// Kotlin
 	implementation("org.jetbrains.kotlin:kotlin-stdlib:${extra["kotlinVersion"] as String}")
+	implementation(kotlin("reflect"))
 
 	// Bluetooth
 	implementation("com.akexorcist:bluetoothspp:1.0.0")
