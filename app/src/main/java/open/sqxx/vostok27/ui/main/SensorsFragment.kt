@@ -33,15 +33,15 @@ class SensorsFragment(val btFront: BluetoothFront) : BaseFragment(), SensorsView
 	}
 
 	override fun showCO2(value: Int) {
-		co2_sensor.updateValue(value.toFloat())
+		co2_sensor.updateValue(value)
 	}
 
 	override fun showTemp(value: Int) {
-		temp_sensor.updateValue(value.toFloat())
+		temp_sensor.updateValue(value)
 	}
 
 	override fun showHumidity(value: Int) {
-		hum_sensor.updateValue(value.toFloat())
+		hum_sensor.updateValue(value)
 	}
 
 	override fun showPressure(value: Float) {
@@ -57,7 +57,7 @@ class SensorsFragment(val btFront: BluetoothFront) : BaseFragment(), SensorsView
 	}
 
 	override fun showEnergyGen(value: Int) {
-		generate.updateValue(value.toFloat())
+		generate.updateValue(value)
 	}
 
 	override fun reset() {
