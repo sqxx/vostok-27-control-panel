@@ -56,9 +56,9 @@ class MainFragment(btFront: BluetoothFront) : BaseFragment() {
 			override fun onTabSelected(tab: TabLayout.Tab?) {
 				selectTab(
 					when (tab!!.position) {
-						0 -> sensorsTab
-						1 -> switchersTab
-						2 -> optionsTab
+						0    -> sensorsTab
+						1    -> switchersTab
+						2    -> optionsTab
 						else -> defaultTab
 					}
 				)
@@ -68,11 +68,11 @@ class MainFragment(btFront: BluetoothFront) : BaseFragment() {
 
 		selectTab(
 			when (currentTabFragment?.tag) {
-				sensorsTab.screenKey -> sensorsTab
-				chartTab.screenKey -> chartTab
+				sensorsTab.screenKey   -> sensorsTab
+				chartTab.screenKey     -> chartTab
 				switchersTab.screenKey -> switchersTab
-				optionsTab.screenKey -> optionsTab
-				else -> defaultTab
+				optionsTab.screenKey   -> optionsTab
+				else                   -> defaultTab
 			}
 		)
 	}

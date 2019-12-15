@@ -8,9 +8,7 @@ import android.view.View
 import android.widget.LinearLayout
 import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data.Entry
-import com.github.mikephil.charting.data.LineData
-import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.ValueFormatter
 import kotlinx.android.synthetic.main.view_sensor_value.view.*
 import open.sqxx.vostok27.R

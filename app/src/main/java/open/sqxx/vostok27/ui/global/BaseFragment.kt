@@ -94,8 +94,8 @@ abstract class BaseFragment : MvpAppCompatFragment() {
 	private fun needCloseScope(): Boolean =
 		when {
 			activity?.isChangingConfigurations == true -> false
-			activity?.isFinishing == true -> true
-			else -> isRealRemoving()
+			activity?.isFinishing == true              -> true
+			else                                       -> isRealRemoving()
 		}
 
 	protected fun showProgressDialog(progress: Boolean) {

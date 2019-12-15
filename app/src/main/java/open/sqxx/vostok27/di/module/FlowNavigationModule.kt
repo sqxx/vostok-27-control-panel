@@ -1,9 +1,7 @@
 package open.sqxx.vostok27.di.module
 
 import open.sqxx.vostok27.model.system.flow.FlowRouter
-import ru.terrakok.cicerone.Cicerone
-import ru.terrakok.cicerone.NavigatorHolder
-import ru.terrakok.cicerone.Router
+import ru.terrakok.cicerone.*
 import toothpick.config.Module
 
 class FlowNavigationModule(globalRouter: Router) : Module() {

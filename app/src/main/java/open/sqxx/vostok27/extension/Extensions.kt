@@ -7,13 +7,9 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.text.SpannableStringBuilder
-import android.text.Spanned
-import android.text.TextUtils
+import android.text.*
 import android.text.style.ForegroundColorSpan
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.webkit.URLUtil
 import android.widget.ImageView
@@ -126,7 +122,7 @@ fun Fragment.tryOpenLink(link: String?, basePath: String? = "https://google.com/
 					Intent.ACTION_VIEW,
 					when {
 						URLUtil.isValidUrl(link) -> Uri.parse(link)
-						else -> Uri.parse(basePath + link)
+						else                     -> Uri.parse(basePath + link)
 					}
 				)
 			)

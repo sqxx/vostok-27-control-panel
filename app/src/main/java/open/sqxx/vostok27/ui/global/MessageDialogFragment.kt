@@ -19,8 +19,8 @@ class MessageDialogFragment : DialogFragment() {
 	private val clickListener
 		get() = when {
 			parentFragment is OnClickListener -> parentFragment as OnClickListener
-			activity is OnClickListener -> activity as OnClickListener
-			else -> object : OnClickListener {}
+			activity is OnClickListener       -> activity as OnClickListener
+			else                              -> object : OnClickListener {}
 		}
 
 	override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =

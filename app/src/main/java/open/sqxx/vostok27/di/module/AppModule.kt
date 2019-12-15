@@ -4,19 +4,13 @@ import android.content.Context
 import android.content.res.AssetManager
 import app.akexorcist.bluetotohspp.library.BluetoothSPP
 import open.sqxx.vostok27.BuildConfig
-import open.sqxx.vostok27.di.CacheLifetime
-import open.sqxx.vostok27.di.DefaultPageSize
-import open.sqxx.vostok27.di.PrimitiveWrapper
+import open.sqxx.vostok27.di.*
 import open.sqxx.vostok27.entity.app.develop.AppInfo
 import open.sqxx.vostok27.model.repository.BluetoothFront
 import open.sqxx.vostok27.model.repository.tools.Base64Tools
-import open.sqxx.vostok27.model.system.AppSchedulers
-import open.sqxx.vostok27.model.system.ResourceManager
-import open.sqxx.vostok27.model.system.SchedulersProvider
+import open.sqxx.vostok27.model.system.*
 import open.sqxx.vostok27.model.system.message.SystemMessageNotifier
-import ru.terrakok.cicerone.Cicerone
-import ru.terrakok.cicerone.NavigatorHolder
-import ru.terrakok.cicerone.Router
+import ru.terrakok.cicerone.*
 import toothpick.config.Module
 
 class AppModule(context: Context) : Module() {
