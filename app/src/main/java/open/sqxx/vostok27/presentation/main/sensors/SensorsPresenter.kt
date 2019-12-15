@@ -10,6 +10,8 @@ import open.sqxx.vostok27.presentation.main.BluetoothFragmentPresenter
 class SensorsPresenter(btFront: BluetoothFront) :
 	BluetoothFragmentPresenter<SensorsView>(btFront) {
 
+	override fun onBluetoothConnected() = BluetoothModel.requestAllSensorsData(btFront)
+
 	override fun handleData(data: UByteArray): Boolean {
 		if (!super.handleData(data)) return false
 

@@ -1,16 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:text="Управление"
-        android:textAlignment="center"
-        android:textColor="@color/black"
-        android:textSize="24sp" />
 
-</LinearLayout>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:layout_margin="8dp"
+    android:scrollbars="none">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Управление станцией -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/values_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            app:cardElevation="4dp">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="12dp"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/TextAppearance.AppCompat.Headline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/card_main_systems_title" />
+
+                <open.sqxx.vostok27.ui.main.view.OptionSwitcherView
+                    android:id="@+id/pressure_relief_valve_switcher"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:description="Управление затворным герметичным клапаном"
+                    app:label="Сброс давления" />
+
+                <open.sqxx.vostok27.ui.main.view.OptionSwitcherView
+                    android:id="@+id/pump_valve_switcher"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:description="Управление клапаном баллона с воздухом"
+                    app:label="Надув станции" />
+
+                <open.sqxx.vostok27.ui.main.view.OptionSwitcherView
+                    android:id="@+id/prod_co2_switcher"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:description="Управление химической реакцией для выработки углекислого газа"
+                    app:label="Выработка CO₂" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </androidx.cardview.widget.CardView>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="4dp" />
+
+        <!-- Управление освещением -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/light_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            app:cardElevation="4dp">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="12dp"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/TextAppearance.AppCompat.Headline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/card_light_control_title" />
+
+                <com.google.android.material.slider.Slider
+                    android:id="@+id/light_level"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:valueFrom="0"
+                    android:valueTo="100"
+                    app:labelColor="@color/white" />
+
+                <open.sqxx.vostok27.ui.main.view.OptionSwitcherView
+                    android:id="@+id/auto_light_switcher"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:description="Автоматическое управление освещением, в зависимости от времени. Ручное управление станет недоступно"
+                    app:label="Автоматическое управление освещением" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </androidx.cardview.widget.CardView>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+</ScrollView>

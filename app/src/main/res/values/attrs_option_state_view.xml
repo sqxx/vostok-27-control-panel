@@ -1,5 +1,5 @@
 <resources>
-    <declare-styleable name="OptionStateView">
+    <declare-styleable name="OptionSwitcherView">
         <attr name="label" />
         <attr name="description" />
         <attr name="switcher_state" />
