@@ -229,11 +229,9 @@ class BluetoothModel {
 
 		fun isResetRequested() = resetRequested
 
-		fun handleReset(btFront: BluetoothFront, data: UByteArray) {
+		fun handleReset(data: UByteArray) {
 			if (resetRequested && data[1] == VALUES_COMMANDS[0]) {
 				resetRequested = false
-			} else if (resetRequested) {
-				requestReset(btFront)
 			}
 		}
 
@@ -245,6 +243,17 @@ class BluetoothModel {
 		//endregion
 
 		//region Обработка исключений
+
+		fun handleIncorrectSize(
+			btFront: BluetoothFront,
+			status: BluetoothPackageStatus
+		): Boolean {
+			val exp = (status == BluetoothPackageStatus.INCORRECT_SIZE)
+
+			if (exp) resetBluetoothPull(btFront)
+
+			return exp
+		}
 
 		fun handleMagicByteError(
 			btFront: BluetoothFront,
