@@ -208,6 +208,10 @@ class BluetoothModel {
 
 		//region Отправка данных
 
+		fun request(btFront: BluetoothFront, cmd: UByte, value: UInt) {
+			btFront.sender.value = buildPackage(cmd, value)
+		}
+
 		fun requestData(btFront: BluetoothFront, cmd: UByte) {
 			btFront.sender.value = buildPackage(cmd, 0U)
 		}
