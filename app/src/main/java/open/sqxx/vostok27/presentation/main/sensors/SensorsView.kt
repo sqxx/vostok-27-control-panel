@@ -8,6 +8,10 @@ interface SensorsView : MvpView {
 	fun showTemp(value: Int)
 	fun showHumidity(value: Int)
 	fun showPressure(value: Float)
-	fun showMessage(msg: String)
-	fun removeMessage()
+
+	fun showVoltage(value: Float)
+	fun showEnergyUsage(value: Float)
+	fun showEnergyGen(value: Int)
+
+	fun reset()
 }

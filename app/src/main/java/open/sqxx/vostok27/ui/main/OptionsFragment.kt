@@ -14,12 +14,13 @@ import open.sqxx.vostok27.ui.global.BaseFragment
 import toothpick.Scope
 import toothpick.config.Module
 
+@ExperimentalUnsignedTypes
 class OptionsFragment(val btFront: BluetoothFront) : BaseFragment(), OptionsView {
 
 	@InjectPresenter
 	lateinit var switchersPresenter: OptionsPresenter
 
-	override val layoutRes = R.layout.fragment_switchers
+	override val layoutRes = R.layout.fragment_options
 
 	@ProvidePresenter
 	fun providePresenter(): OptionsPresenter =

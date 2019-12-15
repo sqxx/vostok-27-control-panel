@@ -8,7 +8,9 @@
 
     <string name="nav_sensors_values">Показатели</string>
     <string name="nav_chart">График</string>
-    <string name="nav_switchers">Модули</string>
-    <string name="nav_options">Параметры</string>
+    <string name="nav_switchers">Управление</string>
+    <string name="nav_options">Настройки</string>
+    <string name="sensors_card_title">Датчики</string>
+    <string name="power_card_title">Питание</string>
 
 </resources>

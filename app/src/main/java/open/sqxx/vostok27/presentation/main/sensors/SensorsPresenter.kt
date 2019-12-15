@@ -4,6 +4,7 @@ import com.arellomobile.mvp.InjectViewState
 import open.sqxx.vostok27.model.repository.BluetoothFront
 import open.sqxx.vostok27.model.repository.BluetoothModel
 import open.sqxx.vostok27.presentation.main.BluetoothFragmentPresenter
+import timber.log.Timber
 
 @ExperimentalUnsignedTypes
 @InjectViewState
@@ -25,19 +26,19 @@ class SensorsPresenter(btFront: BluetoothFront) :
 
 			// Обработка несоответствия магического числа
 			if (it.handleMagicByteError(btFront, status)) {
-				viewState.showMessage("Несовпадение магического числа")
+				Timber.e("Несовпадение магического числа")
 				return
 			}
 
 			// Обработка несоответствия контрольной суммы
 			if (it.handleCRCError(btFront, status)) {
-				viewState.showMessage("Несовпадение контрольной суммы")
+				Timber.e("Несовпадение контрольной суммы")
 				return
 			}
 
 			// Обработка исключений по протоколу
 			if (it.handleProtocolExceptions(btFront, data)) {
-				viewState.showMessage("Ошибки на стороне slave")
+				Timber.e("Ошибки на стороне slave")
 				return
 			}
 

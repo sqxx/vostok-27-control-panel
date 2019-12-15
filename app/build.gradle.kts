@@ -133,6 +133,6 @@ configurations.all {
 
 gradle.buildFinished {
 	println("VersionName: ${android.defaultConfig.versionName}")
-	println("VersionCode: ${android.defaultConfig.versionCode}")
 	println("BuildUid: $buildUid")
 }
+println("VersionCode: ${android.defaultConfig.versionCode}")

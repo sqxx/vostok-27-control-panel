@@ -56,11 +56,11 @@ class BluetoothModel {
 		const val _PE_PACKAGE_ERR_MAGIC: UByte = 0xF4u
 
 		val VALUES_COMMANDS = ubyteArrayOf(
-			_P_REQ_CO2,
-			_P_REQ_HUM,
-			_P_REQ_TEMP,
-			_P_REQ_PRES,
-			_P_REQ_SOLAR_PANELS_EF
+			_P_REQ_CO2
+			//_P_REQ_HUM,
+			//_P_REQ_TEMP,
+			//_P_REQ_PRES,
+			//_P_REQ_SOLAR_PANELS_EF
 		)
 
 		private var resetRequested = false
@@ -82,11 +82,14 @@ class BluetoothModel {
 		}
 
 		fun extractCrc(data: UByteArray): UInt {
+			return try {
+				val highByte = data[PACKAGE_SIZE - 2].toUInt()
+				val lowByte = data[PACKAGE_SIZE - 1].toUInt()
 
-			val highByte = data[PACKAGE_SIZE - 2].toUInt()
-			val lowByte = data[PACKAGE_SIZE - 1].toUInt()
-
-			return highByte.shl(8) or lowByte
+				highByte.shl(8) or lowByte
+			} catch (e: Exception) {
+				0u
+			}
 		}
 
 		fun calculateCrc(data: UByteArray): UInt {
@@ -168,7 +171,7 @@ class BluetoothModel {
 		fun handleReset(btFront: BluetoothFront, data: UByteArray) {
 			if (resetRequested && data[1] == VALUES_COMMANDS[0]) {
 				resetRequested = false
-			} else {
+			} else if (resetRequested) {
 				requestReset(btFront)
 			}
 		}

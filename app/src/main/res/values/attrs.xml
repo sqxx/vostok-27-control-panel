@@ -2,7 +2,7 @@
 <resources>
     <attr name="label" format="string" />
     <attr name="description" format="string" />
-    <attr name="value" format="string" />
+    <attr name="value" format="integer" />
     <attr name="switcher_state" format="boolean" />
     <attr name="unit" format="string" />
 </resources>

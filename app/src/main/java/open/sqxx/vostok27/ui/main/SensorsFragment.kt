@@ -33,26 +33,41 @@ class SensorsFragment(val btFront: BluetoothFront) : BaseFragment(), SensorsView
 	}
 
 	override fun showCO2(value: Int) {
-		co2_sensor.setValue(value.toString())
+		co2_sensor.updateValue(value.toFloat())
 	}
 
 	override fun showTemp(value: Int) {
-		temp_sensor.setValue(value.toString())
+		temp_sensor.updateValue(value.toFloat())
 	}
 
 	override fun showHumidity(value: Int) {
-		hum_sensor.setValue(value.toString())
+		hum_sensor.updateValue(value.toFloat())
 	}
 
 	override fun showPressure(value: Float) {
-		pres_sensor.setValue(String.format("%.2f", value))
+		pres_sensor.updateValue(value)
 	}
 
-	override fun showMessage(msg: String) {
-		message.text = msg
+	override fun showVoltage(value: Float) {
+		battery_voltage.updateValue(value)
 	}
 
-	override fun removeMessage() {
-		message.text = ""
+	override fun showEnergyUsage(value: Float) {
+		usage.updateValue(value)
+	}
+
+	override fun showEnergyGen(value: Int) {
+		generate.updateValue(value.toFloat())
+	}
+
+	override fun reset() {
+		co2_sensor.reset()
+		temp_sensor.reset()
+		hum_sensor.reset()
+		pres_sensor.reset()
+
+		battery_voltage.reset()
+		usage.reset()
+		generate.reset()
 	}
 }

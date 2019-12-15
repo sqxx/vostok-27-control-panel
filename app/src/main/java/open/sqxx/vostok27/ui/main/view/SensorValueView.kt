@@ -66,7 +66,7 @@ class SensorValueView(
 		try {
 			unit = attributes.getString(R.styleable.SensorValueView_unit)!!
 			updateLabel(attributes.getString(R.styleable.SensorValueView_label)!!)
-			updateValue(attributes.getInteger(R.styleable.SensorValueView_value, 0).toUInt())
+			updateValue(attributes.getInteger(R.styleable.SensorValueView_value, 0).toFloat())
 		} finally {
 			attributes.recycle()
 		}
@@ -76,9 +76,9 @@ class SensorValueView(
 		layout.label.text = label
 	}
 
-	fun updateValue(value: UInt) {
+	fun updateValue(value: Float) {
 		// Обновляем метку
-		layout.value.text = value.toString()
+		layout.value.text = ("%.2f".format(value))
 
 		// Первый запуск графика...
 		if (set == null) {
@@ -97,7 +97,7 @@ class SensorValueView(
 
 		// Добавляем новое значение.
 		// y - индекс значения, x - значение
-		values.add(Entry(values.size.toFloat(), value.toFloat()))
+		values.add(Entry(values.size.toFloat(), value))
 
 		// Добавляем маркер
 		dates.add(timeMarker)
@@ -115,7 +115,7 @@ class SensorValueView(
 	}
 
 	fun reset() {
-		updateValue(0u)
+		updateValue(0f)
 
 		set!!.values = mutableListOf<Entry>()
 		refreshChart()

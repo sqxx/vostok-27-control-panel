@@ -2,75 +2,140 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/values_container"
+    <ScrollView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:cardElevation="4dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="8dp"
+        android:scrollbars="none"
+        app:layout_constraintBottom_toBottomOf="@+id/logo"
+        app:layout_constraintEnd_toStartOf="@+id/logo"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="@+id/logo">
 
-        <LinearLayout
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="12dp"
             android:orientation="vertical">
 
-            <open.sqxx.vostok27.ui.main.view.SensorValueView
-                android:id="@+id/co2_sensor"
+            <!-- Показатели с датчиков -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/values_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:label="CO₂"
-                app:unit="ppm"
-                app:value="0" />
+                android:layout_margin="8dp"
+                app:cardElevation="4dp">
 
-            <open.sqxx.vostok27.ui.main.view.SensorValueView
-                android:id="@+id/temp_sensor"
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="12dp"
+                    android:orientation="vertical">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/TextAppearance.AppCompat.Headline"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
+                        android:text="@string/sensors_card_title" />
+
+                    <open.sqxx.vostok27.ui.main.view.SensorValueView
+                        android:id="@+id/co2_sensor"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:label="CO₂"
+                        app:unit="ppm"
+                        app:value="0" />
+
+                    <open.sqxx.vostok27.ui.main.view.SensorValueView
+                        android:id="@+id/temp_sensor"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:label="Температура"
+                        app:unit="℃"
+                        app:value="0" />
+
+                    <open.sqxx.vostok27.ui.main.view.SensorValueView
+                        android:id="@+id/hum_sensor"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:label="Влажность"
+                        app:unit="%"
+                        app:value="0" />
+
+                    <open.sqxx.vostok27.ui.main.view.SensorValueView
+                        android:id="@+id/pres_sensor"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:label="Давление"
+                        app:unit="Бар"
+                        app:value="0" />
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+            </androidx.cardview.widget.CardView>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="4dp" />
+
+            <!-- Питание -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/power_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:label="Температура"
-                app:unit="℃"
-                app:value="0" />
+                android:layout_margin="8dp"
+                app:cardElevation="4dp">
 
-            <open.sqxx.vostok27.ui.main.view.SensorValueView
-                android:id="@+id/hum_sensor"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:label="Влажность"
-                app:unit="%"
-                app:value="0" />
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="12dp"
+                    android:orientation="vertical">
 
-            <open.sqxx.vostok27.ui.main.view.SensorValueView
-                android:id="@+id/pres_sensor"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:label="Давление"
-                app:unit="Бар"
-                app:value="0" />
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/TextAppearance.AppCompat.Headline"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
+                        android:text="@string/power_card_title" />
 
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
+                    <open.sqxx.vostok27.ui.main.view.SensorValueView
+                        android:id="@+id/battery_voltage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:label="Напряжение АКБ"
+                        app:unit=""
+                        app:value="0" />
 
-    <TextView
-        android:id="@+id/message"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:gravity="center"
-        android:textAlignment="center"
-        android:textColor="@color/black"
-        android:textSize="18sp"
+                    <open.sqxx.vostok27.ui.main.view.SensorValueView
+                        android:id="@+id/usage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:label="Потребление"
+                        app:unit=""
+                        app:value="0" />
+
+                    <open.sqxx.vostok27.ui.main.view.SensorValueView
+                        android:id="@+id/generate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:label="Генерация"
+                        app:unit="%"
+                        app:value="0" />
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+            </androidx.cardview.widget.CardView>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </ScrollView>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/logo"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:src="@drawable/ic_outline_board"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_max="wrap"
-        app:layout_constraintHeight_percent="0.2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/values_container"
-        app:layout_constraintWidth_max="wrap"
-        app:layout_constraintWidth_percent="0.6" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
