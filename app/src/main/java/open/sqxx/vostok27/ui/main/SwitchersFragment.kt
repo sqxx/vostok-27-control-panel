@@ -34,6 +34,10 @@ class SwitchersFragment(val btFront: BluetoothFront) : BaseFragment(), Switchers
 		})
 	}
 
+	override fun onAttachFragment() = presenter.onAttachViewToReality()
+
+	override fun onDetachFragment() = presenter.onDetachViewFromReality()
+
 	override fun initialize() {
 		freezeUi()
 		bindListeners()
@@ -86,6 +90,10 @@ class SwitchersFragment(val btFront: BluetoothFront) : BaseFragment(), Switchers
 	override fun updateAutoLightState(isEnabled: Boolean) {
 		light_level.isEnabled = !isEnabled
 		updateSwitcherState(auto_light_switcher, isEnabled)
+	}
+
+	override fun updateLightLevel(value: Int) {
+		light_level.value = value.toFloat()
 	}
 
 	private fun updateSwitcherState(

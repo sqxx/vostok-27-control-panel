@@ -15,7 +15,7 @@ import toothpick.config.Module
 class SensorsFragment(val btFront: BluetoothFront) : BaseFragment(), SensorsView {
 
 	@InjectPresenter
-	lateinit var sensorsPresenter: SensorsPresenter
+	lateinit var presenter: SensorsPresenter
 
 	override val layoutRes = R.layout.fragment_sensors
 
@@ -31,6 +31,10 @@ class SensorsFragment(val btFront: BluetoothFront) : BaseFragment(), SensorsView
 			}
 		})
 	}
+
+	override fun onAttachFragment() = presenter.onAttachViewToReality()
+
+	override fun onDetachFragment() = presenter.onDetachViewFromReality()
 
 	override fun showCO2(value: Int) {
 		co2_sensor.updateValue(value)

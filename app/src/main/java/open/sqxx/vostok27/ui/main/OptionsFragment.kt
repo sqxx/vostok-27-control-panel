@@ -33,6 +33,10 @@ class OptionsFragment(val btFront: BluetoothFront) : BaseFragment(), OptionsView
 		})
 	}
 
+	override fun onAttachFragment() = presenter.onAttachViewToReality()
+
+	override fun onDetachFragment() = presenter.onDetachViewFromReality()
+
 	override fun initialize() {
 		freezeUi()
 		bindListeners()
@@ -43,7 +47,7 @@ class OptionsFragment(val btFront: BluetoothFront) : BaseFragment(), OptionsView
 		// Чтобы не сломать консистентность ui,
 		//   замораживаем элементы управления до получения состояния на slave
 
-		current_time.updateState(true)
+		current_time.updateState(false)
 		day_time.updateState(false)
 		night_time.updateState(false)
 	}

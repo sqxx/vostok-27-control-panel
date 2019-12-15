@@ -93,11 +93,13 @@ class MainFragment(btFront: BluetoothFront) : BaseFragment() {
 
 			currentFragment?.let {
 				hide(it)
+				it.onDetachFragment()
 				it.userVisibleHint = false
 			}
 
 			newFragment?.let {
 				show(it)
+				(it as BaseFragment).onAttachFragment()
 				it.userVisibleHint = true
 			}
 		}.commitNow()

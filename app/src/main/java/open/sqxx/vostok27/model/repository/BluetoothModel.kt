@@ -64,6 +64,7 @@ class BluetoothModel {
 		const val _P_STATUS_AUTO_LIGHT: UByte = 0xB8u
 
 		const val _P_SET_LIGHT_LEVEL: UByte = 0xC1u
+		const val _P_GET_LIGHT_LEVEL: UByte = 0xC2u
 
 		const val _P_SET_TIME: UByte = 0xD1u
 		const val _P_GET_TIME: UByte = 0xD4u

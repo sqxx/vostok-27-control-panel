@@ -14,6 +14,7 @@ import toothpick.Toothpick
 private const val PROGRESS_TAG = "bf_progress"
 private const val STATE_SCOPE_NAME = "state_scope_name"
 
+@ExperimentalUnsignedTypes
 abstract class BaseFragment : MvpAppCompatFragment() {
 	abstract val layoutRes: Int
 
@@ -29,6 +30,10 @@ abstract class BaseFragment : MvpAppCompatFragment() {
 	private lateinit var fragmentScopeName: String
 	protected lateinit var scope: Scope
 		private set
+
+	open fun onAttachFragment() {}
+
+	open fun onDetachFragment() {}
 
 	protected open fun installModules(scope: Scope) {}
 

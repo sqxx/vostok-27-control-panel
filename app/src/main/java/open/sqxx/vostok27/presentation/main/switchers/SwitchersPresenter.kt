@@ -3,6 +3,7 @@ package open.sqxx.vostok27.presentation.main.switchers
 import com.arellomobile.mvp.InjectViewState
 import open.sqxx.vostok27.model.repository.BluetoothFront
 import open.sqxx.vostok27.model.repository.BluetoothModel
+import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_GET_LIGHT_LEVEL
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_SET_LIGHT_LEVEL
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_STATUS_AUTO_LIGHT
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_STATUS_PRES_RELIEF_VALVE
@@ -55,6 +56,9 @@ class SwitchersPresenter(btFront: BluetoothFront) :
 				_P_SWITCH_AUTO_LIGHT, _P_STATUS_AUTO_LIGHT               -> {
 					viewState.updateAutoLightState(isEnabled)
 				}
+				_P_GET_LIGHT_LEVEL                                       -> {
+					viewState.updateLightLevel(value.toInt())
+				}
 			}
 		}
 
@@ -84,6 +88,9 @@ class SwitchersPresenter(btFront: BluetoothFront) :
 
 	private fun requestAutoLightState() =
 		BluetoothModel.requestData(btFront, _P_STATUS_AUTO_LIGHT)
+
+	fun getLightLevel() =
+		requestState(_P_GET_LIGHT_LEVEL)
 
 	fun setLightLevel(percent: UInt) {
 		BluetoothModel.request(

@@ -10,7 +10,17 @@ import open.sqxx.vostok27.presentation.main.BluetoothFragmentPresenter
 class SensorsPresenter(btFront: BluetoothFront) :
 	BluetoothFragmentPresenter<SensorsView>(btFront) {
 
-	override fun onBluetoothConnected() = BluetoothModel.requestAllSensorsData(btFront)
+	override fun onBluetoothConnected() {
+		super.onBluetoothConnected()
+		BluetoothModel.requestAllSensorsData(btFront)
+	}
+
+	override fun onAttachViewToReality() {
+		super.onAttachViewToReality()
+		if (isBluetoothConnected) {
+			BluetoothModel.requestAllSensorsData(btFront)
+		}
+	}
 
 	override fun handleData(data: UByteArray): Boolean {
 		if (!super.handleData(data)) return false
@@ -45,8 +55,8 @@ class SensorsPresenter(btFront: BluetoothFront) :
 				}
 			}
 
-			// Пул полностью обработан
-			if (command == it.VALUES_COMMANDS.last())
+			// Пул полностью обработан и фрагмент присутствует на экране
+			if (command == it.VALUES_COMMANDS.last() && isViewInReality)
 				it.requestAllSensorsData(btFront)
 		}
 

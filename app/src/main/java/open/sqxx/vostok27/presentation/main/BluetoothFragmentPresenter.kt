@@ -11,6 +11,9 @@ import timber.log.Timber
 abstract class BluetoothFragmentPresenter<T : MvpView>(val btFront: BluetoothFront) :
 	MvpPresenter<T>() {
 
+	protected var isBluetoothConnected = false
+	protected var isViewInReality = false
+
 	init {
 		btFront.receiver.observable.subscribe {
 			if (it.isEmpty())
@@ -20,12 +23,25 @@ abstract class BluetoothFragmentPresenter<T : MvpView>(val btFront: BluetoothFro
 		}
 
 		btFront.status.observable.subscribe {
-			if (it != BluetoothStatus.CONNECTED) return@subscribe
+			if (it != BluetoothStatus.CONNECTED) {
+				isBluetoothConnected = false
+				return@subscribe
+			}
 			onBluetoothConnected()
 		}
 	}
 
-	protected open fun onBluetoothConnected() {}
+	protected open fun onBluetoothConnected() {
+		isBluetoothConnected = true
+	}
+
+	open fun onAttachViewToReality() {
+		isViewInReality = true
+	}
+
+	open fun onDetachViewFromReality() {
+		isViewInReality = false
+	}
 
 	protected open fun handleData(data: UByteArray): Boolean {
 		BluetoothModel.let {

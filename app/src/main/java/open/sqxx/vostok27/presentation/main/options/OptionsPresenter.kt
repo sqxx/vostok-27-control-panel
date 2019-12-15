@@ -20,10 +20,20 @@ class OptionsPresenter(btFront: BluetoothFront) :
 		viewState.initialize()
 	}
 
-	override fun onBluetoothConnected() {
+	private fun requestTime() {
 		requestCurrentTime()
 		requestDayTime()
 		requestNightTime()
+	}
+
+	override fun onBluetoothConnected() {
+		super.onBluetoothConnected()
+		requestTime()
+	}
+
+	override fun onAttachViewToReality() {
+		super.onAttachViewToReality()
+		requestTime()
 	}
 
 	override fun handleData(data: UByteArray): Boolean {
@@ -41,6 +51,10 @@ class OptionsPresenter(btFront: BluetoothFront) :
 				_P_GET_TIME       -> viewState.updateCurrentTime(hour, minute)
 				_P_GET_DAY_TIME   -> viewState.updateDayTime(hour, minute)
 				_P_GET_NIGHT_TIME -> viewState.updateNightTime(hour, minute)
+			}
+
+			if (command == _P_GET_NIGHT_TIME) {
+				requestTime()
 			}
 		}
 

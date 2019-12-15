@@ -9,4 +9,5 @@ interface SwitchersView : MvpView {
 	fun updatePumpValveState(isEnabled: Boolean)
 	fun updateProdCO2State(isEnabled: Boolean)
 	fun updateAutoLightState(isEnabled: Boolean)
+	fun updateLightLevel(value: Int)
 }
