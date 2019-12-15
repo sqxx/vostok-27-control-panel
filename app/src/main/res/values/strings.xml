@@ -12,5 +12,8 @@
     <string name="nav_options">Настройки</string>
     <string name="sensors_card_title">Датчики</string>
     <string name="power_card_title">Питание</string>
+    <string name="card_main_systems_title">Основные системы</string>
+    <string name="card_light_control_title">Управление освещением</string>
+    <string name="card_light_settings_title">Настройка освещения</string>
 
 </resources>

@@ -21,9 +21,11 @@ abstract class BluetoothFragmentPresenter<T : MvpView>(val btFront: BluetoothFro
 
 		btFront.status.observable.subscribe {
 			if (it != BluetoothStatus.CONNECTED) return@subscribe
-			BluetoothModel.requestAllSensorsData(btFront)
+			onBluetoothConnected()
 		}
 	}
+
+	protected open fun onBluetoothConnected() {}
 
 	protected open fun handleData(data: UByteArray): Boolean {
 		BluetoothModel.let {

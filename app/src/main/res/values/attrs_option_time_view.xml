@@ -1,6 +1,7 @@
 <resources>
     <declare-styleable name="OptionTimeView">
         <attr name="title" />
-        <attr name="value" />
+        <attr name="hour" format="integer" />
+        <attr name="minute" format="integer" />
     </declare-styleable>
 </resources>
