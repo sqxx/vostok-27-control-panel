@@ -74,10 +74,21 @@ class SensorValueView(
 		layout.label.text = label
 	}
 
-	fun updateValue(value: Float) {
-		// Обновляем метку
-		layout.value.text = ("%.2f".format(value))
+	fun <T> updateValue(value: T)
+		where T : Number {
 
+		val isFloatingPointNumber = ((value.toFloat() / 10f) != 0.0f)
+
+		if (isFloatingPointNumber) {
+			layout.value.text = ("${"%.2f".format(value.toFloat())} $unit")
+		} else {
+			layout.value.text = ("${"%d".format(value.toInt())} $unit")
+		}
+
+		updateChart(value.toFloat())
+	}
+
+	private fun updateChart(value: Float) {
 		// Первый запуск графика...
 		if (set == null) {
 			setupChart()
