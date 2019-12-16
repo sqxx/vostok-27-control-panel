@@ -14,23 +14,32 @@ import ru.terrakok.cicerone.android.support.SupportAppScreen
 class MainFragment(btFront: BluetoothFront) : BaseFragment() {
 
 	companion object {
-		private val sensorsTab = Screens.Sensors
-		private val switchersTab = Screens.Switchers
-		private val optionsTab = Screens.Options
+		private val sensorsScreen = Screens.Sensors
+		private val switchersScreen = Screens.Switchers
+		private val optionsScreen = Screens.Options
 
-		private val defaultTab = sensorsTab
+		private val defaultScreen = sensorsScreen
 	}
 
 	override val layoutRes = R.layout.fragment_main
 
-	private val currentTabFragment: BaseFragment?
+	private var prevScreenFragment: BaseFragment? = null
+	private val currentScreenFragment: BaseFragment?
 		get() = childFragmentManager.fragments.firstOrNull { !it.isHidden } as? BaseFragment
+
+	private fun getScreen(tab: TabLayout.Tab?) =
+		when (tab!!.position) {
+			0    -> sensorsScreen
+			1    -> switchersScreen
+			2    -> optionsScreen
+			else -> defaultScreen
+		}
 
 	init {
 		btFront.let {
-			sensorsTab.bluetoothFront = it
-			switchersTab.bluetoothFront = it
-			optionsTab.bluetoothFront = it
+			sensorsScreen.bluetoothFront = it
+			switchersScreen.bluetoothFront = it
+			optionsScreen.bluetoothFront = it
 		}
 	}
 
@@ -40,70 +49,58 @@ class MainFragment(btFront: BluetoothFront) : BaseFragment() {
 	}
 
 	override fun onBackPressed() {
-		currentTabFragment?.onBackPressed()
+		currentScreenFragment?.onBackPressed()
 	}
 
 	private fun setupNavigation() {
 		tabs.addOnTabSelectedListener(object : OnTabSelectedListener {
-			override fun onTabReselected(tab: TabLayout.Tab?) {}
+			override fun onTabReselected(tab: TabLayout.Tab?) {
+			}
 
 			override fun onTabUnselected(tab: TabLayout.Tab?) {
-				//todo stop bluetooth presenter on selected tab
 			}
 
 			override fun onTabSelected(tab: TabLayout.Tab?) {
-				selectTab(
-					when (tab!!.position) {
-						0    -> sensorsTab
-						1    -> switchersTab
-						2    -> optionsTab
-						else -> defaultTab
-					}
-				)
+				val currentScreen = getScreen(tab)
+				selectScreen(currentScreen)
 			}
-
 		})
 
-		selectTab(
-			when (currentTabFragment?.tag) {
-				sensorsTab.screenKey   -> sensorsTab
-				switchersTab.screenKey -> switchersTab
-				optionsTab.screenKey   -> optionsTab
-				else                   -> defaultTab
-			}
-		)
+		//tabs.selectScreen(tabs.getTabAt(0))
+		selectScreen(defaultScreen)
 	}
 
-	private fun selectTab(tab: SupportAppScreen) {
-		val currentFragment = currentTabFragment
-		val newFragment = childFragmentManager.findFragmentByTag(tab.screenKey)
+	private fun selectScreen(screen: SupportAppScreen) {
+		val newFragment = childFragmentManager.findFragmentByTag(screen.screenKey)
 
-		if (currentFragment != null &&
+		if (currentScreenFragment != null &&
 			newFragment != null &&
-			currentFragment == newFragment
+			currentScreenFragment == newFragment
 		) return
 
 		childFragmentManager.beginTransaction().apply {
-			if (newFragment == null)
+			if (newFragment == null) {
 				add(
 					R.id.mainScreenContainer,
-					createTabFragment(tab),
-					tab.screenKey
+					screen.fragment,
+					screen.screenKey
 				)
+			}
 
-			currentFragment?.let {
+			currentScreenFragment?.let {
 				hide(it)
-				it.onDetachFragment()
+				prevScreenFragment = it
 				it.userVisibleHint = false
 			}
 
 			newFragment?.let {
 				show(it)
-				(it as BaseFragment).onAttachFragment()
 				it.userVisibleHint = true
 			}
 		}.commitNow()
-	}
+		childFragmentManager.executePendingTransactions()
 
-	private fun createTabFragment(tab: SupportAppScreen) = tab.fragment
+		prevScreenFragment?.onDetachFragment()
+		currentScreenFragment?.onAttachFragment()
+	}
 }
