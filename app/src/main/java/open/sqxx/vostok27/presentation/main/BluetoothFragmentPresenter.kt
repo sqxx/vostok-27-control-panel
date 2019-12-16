@@ -12,7 +12,7 @@ abstract class BluetoothFragmentPresenter<T : MvpView>(val btFront: BluetoothFro
 	MvpPresenter<T>() {
 
 	protected var isBluetoothConnected = false
-	protected var isViewInReality = false
+	protected var isFragmentInReality = false
 
 	init {
 		btFront.receiver.observable.subscribe {
@@ -24,48 +24,57 @@ abstract class BluetoothFragmentPresenter<T : MvpView>(val btFront: BluetoothFro
 
 		btFront.status.observable.subscribe {
 			if (it != BluetoothStatus.CONNECTED) {
-				isBluetoothConnected = false
+				onBluetoothDisconnected()
 				return@subscribe
 			}
 			onBluetoothConnected()
 		}
 	}
 
+	//region События
+
 	protected open fun onBluetoothConnected() {
 		isBluetoothConnected = true
 	}
 
-	open fun onAttachViewToReality() {
-		isViewInReality = true
+	protected open fun onBluetoothDisconnected() {
+		isBluetoothConnected = false
 	}
 
-	open fun onDetachViewFromReality() {
-		isViewInReality = false
+	open fun onAttachFragmentToReality() {
+		isFragmentInReality = true
 	}
+
+	open fun onDetachFragmentFromReality() {
+		isFragmentInReality = false
+	}
+
+	//endregion
 
 	protected open fun handleData(data: UByteArray): Boolean {
 		BluetoothModel.let {
 
 			// Обработка команды сброса
-			// После отправки reset будут ещё некоторое время приходить битые пакеты, игнорируем их
-			it.handleReset(data)
-			if (it.isResetRequested())
+			it.handleReset(data) { d -> validateReset(d) }
+			if (it.isResetRequested()) {
+				it.resetBluetoothPull(btFront) { bt -> actionAfterReset(bt) }
 				return false
+			}
 
 			// Проверка пакета
-			when (val status = it.checkPackage(data)) {
+			when (it.checkPackage(data)) {
 				BluetoothPackageStatus.INCORRECT_SIZE       -> {
-					it.handleIncorrectSize(btFront, status)
+					it.handleIncorrectSize(btFront) { bt -> actionAfterReset(bt) }
 					handleIncorrectSize(data)
 					return false
 				}
 				BluetoothPackageStatus.INCORRECT_MAGIC_BYTE -> {
-					it.handleMagicByteError(btFront, status)
+					it.handleIncorrectMagicByte(btFront) { bt -> actionAfterReset(bt) }
 					handleIncorrectMagicByte(data)
 					return false
 				}
 				BluetoothPackageStatus.INCORRECT_CRC        -> {
-					it.handleCRCError(btFront, status)
+					it.handleIncorrectCRC(btFront) { bt -> actionAfterReset(bt) }
 					handleIncorrectCRC(data)
 					return false
 				}
@@ -73,10 +82,21 @@ abstract class BluetoothFragmentPresenter<T : MvpView>(val btFront: BluetoothFro
 					// nothing to do
 				}
 			}
+
 		}
 
 		return true
 	}
+
+	//region Обработка команды reset
+
+	protected open fun validateReset(data: UByteArray): Boolean = true
+
+	protected open fun actionAfterReset(btFront: BluetoothFront) {}
+
+	//endregion
+
+	//region Обработка исключений
 
 	protected open fun handleIncorrectSize(data: UByteArray) {
 		Timber.e("Повреждённый пакет")
@@ -89,4 +109,6 @@ abstract class BluetoothFragmentPresenter<T : MvpView>(val btFront: BluetoothFro
 	protected open fun handleIncorrectCRC(data: UByteArray) {
 		Timber.e("Несовпадение контрольной суммы")
 	}
+
+	//endregion
 }

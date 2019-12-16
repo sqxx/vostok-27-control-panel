@@ -77,7 +77,7 @@ class SensorValueView(
 	fun <T> updateValue(value: T)
 		where T : Number {
 
-		val isFloatingPointNumber = ((value.toFloat() / 10f) != 0.0f)
+		val isFloatingPointNumber = ((value.toFloat() * 10f) % 10 != 0.0f)
 
 		if (isFloatingPointNumber) {
 			layout.value.text = ("${"%.2f".format(value.toFloat())} $unit")

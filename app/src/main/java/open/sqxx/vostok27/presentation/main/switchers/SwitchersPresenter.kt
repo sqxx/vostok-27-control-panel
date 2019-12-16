@@ -15,6 +15,7 @@ import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_SWITCH_PR
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_SWITCH_PUMP_VALVE
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_SYSTEM_DISABLED
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_SYSTEM_ENABLED
+import open.sqxx.vostok27.model.repository.BluetoothModel.Companion.extractCommand
 import open.sqxx.vostok27.presentation.main.BluetoothFragmentPresenter
 
 @ExperimentalUnsignedTypes
@@ -22,15 +23,59 @@ import open.sqxx.vostok27.presentation.main.BluetoothFragmentPresenter
 class SwitchersPresenter(btFront: BluetoothFront) :
 	BluetoothFragmentPresenter<SwitchersView>(btFront) {
 
+	companion object {
+		private val SWITCHERS_STATUS_COMMANDS = ubyteArrayOf(
+			_P_STATUS_PRES_RELIEF_VALVE,
+			_P_STATUS_PUMP_VALVE,
+			_P_STATUS_PROD_CO2,
+			_P_STATUS_AUTO_LIGHT,
+			_P_GET_LIGHT_LEVEL
+		)
+	}
+
+	private var latestPackage: UByteArray = ubyteArrayOf()
+
 	init {
 		viewState.initialize()
 	}
 
+	private fun requestValues() =
+		SWITCHERS_STATUS_COMMANDS.forEach { requestState(it) }
+
+	//region Обработка команды reset
+
+	override fun actionAfterReset(btFront: BluetoothFront) {
+		super.actionAfterReset(btFront)
+
+		// Если сбой произошёл при опросе состояния систем...
+		if (extractCommand(latestPackage) in SWITCHERS_STATUS_COMMANDS)
+			requestValues()
+
+		// В противном случае повторяем прошлый пакет вновь
+		else
+			btFront.sender.value = latestPackage
+	}
+
+	override fun validateReset(data: UByteArray): Boolean {
+		val command = extractCommand(data)
+
+		return if (command == SWITCHERS_STATUS_COMMANDS[0])
+			true
+		else extractCommand(latestPackage) == command
+	}
+
+	//endregion
+
 	override fun onBluetoothConnected() {
-		requestPressureReliefValveState()
-		requestPumpValveState()
-		requestProdCO2State()
-		requestAutoLightState()
+		super.onBluetoothConnected()
+		requestValues()
+	}
+
+	override fun onAttachFragmentToReality() {
+		super.onAttachFragmentToReality()
+		if (isBluetoothConnected) {
+			requestValues()
+		}
 	}
 
 	override fun handleData(data: UByteArray): Boolean {
@@ -38,7 +83,7 @@ class SwitchersPresenter(btFront: BluetoothFront) :
 
 		BluetoothModel.let {
 
-			val command = data[1]
+			val command = it.extractCommand(data)
 			val value = it.extractValue(data)
 
 			val isEnabled = (value.toUByte() == _P_SYSTEM_ENABLED)
@@ -68,29 +113,14 @@ class SwitchersPresenter(btFront: BluetoothFront) :
 	fun setPressureReliefValveState(isEnabled: Boolean) =
 		setState(_P_SWITCH_PRES_RELIEF_VALVE, isEnabled)
 
-	private fun requestPressureReliefValveState() =
-		requestState(_P_STATUS_PRES_RELIEF_VALVE)
-
 	fun setPumpValveState(isEnabled: Boolean) =
 		setState(_P_SWITCH_PUMP_VALVE, isEnabled)
-
-	private fun requestPumpValveState() =
-		requestState(_P_STATUS_PUMP_VALVE)
 
 	fun setProdCO2State(isEnabled: Boolean) =
 		setState(_P_SWITCH_PROD_CO2, isEnabled)
 
-	private fun requestProdCO2State() =
-		requestState(_P_STATUS_PROD_CO2)
-
 	fun setAutoLightState(isEnabled: Boolean) =
 		setState(_P_SWITCH_AUTO_LIGHT, isEnabled)
-
-	private fun requestAutoLightState() =
-		BluetoothModel.requestData(btFront, _P_STATUS_AUTO_LIGHT)
-
-	fun getLightLevel() =
-		requestState(_P_GET_LIGHT_LEVEL)
 
 	fun setLightLevel(percent: UInt) {
 		BluetoothModel.request(
@@ -101,16 +131,15 @@ class SwitchersPresenter(btFront: BluetoothFront) :
 	}
 
 	private fun setState(command: UByte, isEnabled: Boolean) {
-		BluetoothModel.request(
+		latestPackage = BluetoothModel.request(
 			btFront,
 			command,
-			if (isEnabled)
-				_P_SYSTEM_ENABLED.toUInt()
-			else
-				_P_SYSTEM_DISABLED.toUInt()
+			if (isEnabled) _P_SYSTEM_ENABLED.toUInt()
+			else _P_SYSTEM_DISABLED.toUInt()
 		)
 	}
 
-	private fun requestState(command: UByte) =
-		BluetoothModel.requestData(btFront, command)
+	private fun requestState(command: UByte) {
+		latestPackage = BluetoothModel.requestData(btFront, command)
+	}
 }

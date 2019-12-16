@@ -22,6 +22,8 @@ class OptionSwitcherView(
 
 	var onToggleListener: ((isChecked: Boolean) -> Unit)? = null
 
+	private var checkedStateChangedProgrammatically = false
+
 	init {
 		bindListeners()
 		collectAttributes()
@@ -29,7 +31,10 @@ class OptionSwitcherView(
 
 	private fun bindListeners() {
 		layout.switcher.setOnCheckedChangeListener { _, isChecked ->
-			onToggleListener?.invoke(isChecked)
+			if (!checkedStateChangedProgrammatically)
+				onToggleListener?.invoke(isChecked)
+
+			checkedStateChangedProgrammatically = false
 		}
 	}
 
@@ -65,6 +70,7 @@ class OptionSwitcherView(
 
 	fun updateCheckedState(isChecked: Boolean) {
 		layout.switcher.isChecked = isChecked
+		checkedStateChangedProgrammatically = true
 	}
 
 	fun updateState(isEnabled: Boolean) {

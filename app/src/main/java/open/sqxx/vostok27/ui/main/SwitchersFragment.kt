@@ -34,9 +34,13 @@ class SwitchersFragment(val btFront: BluetoothFront) : BaseFragment(), Switchers
 		})
 	}
 
-	override fun onAttachFragment() = presenter.onAttachViewToReality()
+	override fun onAttachFragment() {
+		presenter.onAttachFragmentToReality()
+	}
 
-	override fun onDetachFragment() = presenter.onDetachViewFromReality()
+	override fun onDetachFragment() {
+		presenter.onDetachFragmentFromReality()
+	}
 
 	override fun initialize() {
 		freezeUi()

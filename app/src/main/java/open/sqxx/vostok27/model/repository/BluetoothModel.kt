@@ -13,7 +13,7 @@ class BluetoothModel {
 		/*
 		 * Сделано для удобства
 		 * BluetoothSPP при получении данных обрезает CR LF
-		 * Не учитываем 0x0D 0x0A при проверке данных
+		 * Не учитываем 0x0D 0x0A при работе с данными
 		 */
 		const val PACKAGE_SIZE = 10 - 2
 
@@ -90,17 +90,7 @@ class BluetoothModel {
 
 		const val _PE_UNKNOWN_CMD: UByte = 0xE3u
 
-		//endregion_P_ENERGY_GEN
-
-		val VALUES_COMMANDS = ubyteArrayOf(
-			_P_REQ_CO2,
-			_P_REQ_HUM,
-			_P_REQ_TEMP,
-			_P_REQ_PRES,
-			_P_BATTERY_VOLTAGE,
-			_P_ENERGY_USAGE,
-			_P_ENERGY_GEN
-		)
+		//endregion
 
 		private var resetRequested = false
 
@@ -125,15 +115,20 @@ class BluetoothModel {
 
 			val pack = ubyteArrayOf(
 				START_MAGIC,
-				cmd,
-				0U, 0U, 0U, 0U,
-				0U, 0U
+				0u,
+				0u, 0u, 0u, 0u,
+				0u, 0u
 			)
 
+			packCommand(pack, cmd.toUInt())
 			packValue(pack, value)
 			packCrc(pack)
 
 			return pack
+		}
+
+		fun packCommand(data: UByteArray, value: UInt) {
+			data[1] = value.toUByte()
 		}
 
 		fun packValue(data: UByteArray, value: UInt) {
@@ -163,6 +158,9 @@ class BluetoothModel {
 		//endregion
 
 		//region Извлечение данных
+
+		fun extractCommand(data: UByteArray): UByte =
+			data[1]
 
 		fun extractValue(data: UByteArray): UInt {
 			val b1 = data[2].toUInt()
@@ -199,33 +197,36 @@ class BluetoothModel {
 			}
 		}
 
-		fun isValidSize(data: UByteArray) = PACKAGE_SIZE == data.size
+		fun isValidSize(data: UByteArray) =
+			PACKAGE_SIZE == data.size
 
-		fun isValidMagicByte(data: UByteArray) = START_MAGIC == data.first()
+		fun isValidMagicByte(data: UByteArray) =
+			START_MAGIC == data.first()
 
-		fun isValidCRC(data: UByteArray) = extractCrc(data) == calculateCrc(data)
+		fun isValidCRC(data: UByteArray) =
+			extractCrc(data) == calculateCrc(data)
 
 		//endregion
 
 		//region Отправка данных
 
-		fun request(btFront: BluetoothFront, cmd: UByte, value: UInt) {
-			btFront.sender.value = buildPackage(cmd, value)
-		}
-
-		fun requestData(btFront: BluetoothFront, cmd: UByte) {
-			btFront.sender.value = buildPackage(cmd, 0U)
-		}
-
-		fun requestReset(btFront: BluetoothFront) {
-			resetRequested = true
-			requestData(btFront, _P_SERIAL_RESET.toUByte())
-		}
-
-		fun requestAllSensorsData(btFront: BluetoothFront) {
-			VALUES_COMMANDS.forEach {
-				requestData(btFront, it)
+		fun request(btFront: BluetoothFront, cmd: UByte, value: UInt): UByteArray {
+			buildPackage(cmd, value).let {
+				btFront.sender.value = it
+				return it
 			}
+		}
+
+		fun requestData(btFront: BluetoothFront, cmd: UByte): UByteArray {
+			buildPackage(cmd, 0u).let {
+				btFront.sender.value = it
+				return it
+			}
+		}
+
+		fun requestReset(btFront: BluetoothFront): UByteArray {
+			resetRequested = true
+			return requestData(btFront, _P_SERIAL_RESET.toUByte())
 		}
 
 		//endregion
@@ -234,15 +235,23 @@ class BluetoothModel {
 
 		fun isResetRequested() = resetRequested
 
-		fun handleReset(data: UByteArray) {
-			if (resetRequested && data[1] == VALUES_COMMANDS[0]) {
+		fun handleReset(
+			data: UByteArray,
+			validator: ((UByteArray) -> Boolean)
+		) {
+			val resetComplete = validator.invoke(data)
+
+			if (resetRequested && resetComplete) {
 				resetRequested = false
 			}
 		}
 
-		fun resetBluetoothPull(btFront: BluetoothFront) {
+		fun resetBluetoothPull(
+			btFront: BluetoothFront,
+			action: ((BluetoothFront) -> Any)
+		) {
 			requestReset(btFront)
-			requestAllSensorsData(btFront)
+			action.invoke(btFront)
 		}
 
 		//endregion
@@ -251,52 +260,18 @@ class BluetoothModel {
 
 		fun handleIncorrectSize(
 			btFront: BluetoothFront,
-			status: BluetoothPackageStatus
-		): Boolean {
-			val exp = (status == BluetoothPackageStatus.INCORRECT_SIZE)
+			action: ((BluetoothFront) -> Any)
+		) = resetBluetoothPull(btFront, action)
 
-			if (exp) resetBluetoothPull(btFront)
-
-			return exp
-		}
-
-		fun handleMagicByteError(
+		fun handleIncorrectMagicByte(
 			btFront: BluetoothFront,
-			status: BluetoothPackageStatus
-		): Boolean {
-			val exp = (status == BluetoothPackageStatus.INCORRECT_MAGIC_BYTE)
+			action: ((BluetoothFront) -> Any)
+		) = resetBluetoothPull(btFront, action)
 
-			if (exp) resetBluetoothPull(btFront)
-
-			return exp
-		}
-
-		fun handleCRCError(
+		fun handleIncorrectCRC(
 			btFront: BluetoothFront,
-			status: BluetoothPackageStatus
-		): Boolean {
-			val exp = (status == BluetoothPackageStatus.INCORRECT_CRC)
-
-			if (exp) resetBluetoothPull(btFront)
-
-			return exp
-		}
-
-		fun handleProtocolExceptions(
-			btFront: BluetoothFront,
-			data: UByteArray
-		): Boolean {
-			val command = data[1]
-
-			val exp = (command == _PE_PACKAGE_ERROR ||
-				command == _PE_PACKAGE_CRC ||
-				command == _PE_PACKAGE_ERR_CRLF ||
-				command == _PE_PACKAGE_ERR_MAGIC)
-
-			if (exp) resetBluetoothPull(btFront)
-
-			return exp
-		}
+			action: ((BluetoothFront) -> Any)
+		) = resetBluetoothPull(btFront, action)
 
 		//endregion
 	}
