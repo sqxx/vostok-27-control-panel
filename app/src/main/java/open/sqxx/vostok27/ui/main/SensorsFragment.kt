@@ -32,9 +32,13 @@ class SensorsFragment(val btFront: BluetoothFront) : BaseFragment(), SensorsView
 		})
 	}
 
-	override fun onAttachFragment() = presenter.onAttachViewToReality()
+	override fun onAttachFragment() {
+		presenter.onAttachFragmentToReality()
+	}
 
-	override fun onDetachFragment() = presenter.onDetachViewFromReality()
+	override fun onDetachFragment() {
+		presenter.onDetachFragmentFromReality()
+	}
 
 	override fun showCO2(value: Int) {
 		co2_sensor.updateValue(value)
@@ -52,11 +56,11 @@ class SensorsFragment(val btFront: BluetoothFront) : BaseFragment(), SensorsView
 		pres_sensor.updateValue(value)
 	}
 
-	override fun showVoltage(value: Float) {
+	override fun showVoltage(value: Int) {
 		battery_voltage.updateValue(value)
 	}
 
-	override fun showEnergyUsage(value: Float) {
+	override fun showEnergyUsage(value: Int) {
 		usage.updateValue(value)
 	}
 

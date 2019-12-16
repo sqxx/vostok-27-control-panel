@@ -3,6 +3,8 @@ package open.sqxx.vostok27.presentation.main.sensors
 import com.arellomobile.mvp.InjectViewState
 import open.sqxx.vostok27.model.repository.BluetoothFront
 import open.sqxx.vostok27.model.repository.BluetoothModel
+import open.sqxx.vostok27.model.repository.BluetoothModel.Companion.extractCommand
+import open.sqxx.vostok27.model.repository.BluetoothModel.Companion.requestData
 import open.sqxx.vostok27.presentation.main.BluetoothFragmentPresenter
 
 @ExperimentalUnsignedTypes
@@ -10,15 +12,43 @@ import open.sqxx.vostok27.presentation.main.BluetoothFragmentPresenter
 class SensorsPresenter(btFront: BluetoothFront) :
 	BluetoothFragmentPresenter<SensorsView>(btFront) {
 
-	override fun onBluetoothConnected() {
-		super.onBluetoothConnected()
-		BluetoothModel.requestAllSensorsData(btFront)
+	companion object {
+		private val VALUES_COMMANDS = ubyteArrayOf(
+			BluetoothModel._P_REQ_CO2,
+			BluetoothModel._P_REQ_HUM,
+			BluetoothModel._P_REQ_TEMP,
+			BluetoothModel._P_REQ_PRES,
+			BluetoothModel._P_BATTERY_VOLTAGE,
+			BluetoothModel._P_ENERGY_USAGE,
+			BluetoothModel._P_ENERGY_GEN
+		)
 	}
 
-	override fun onAttachViewToReality() {
-		super.onAttachViewToReality()
+	private fun requestAllSensorsData(btFront: BluetoothFront) =
+		VALUES_COMMANDS.forEach { requestData(btFront, it) }
+
+	//region Обработка команды reset
+
+	override fun actionAfterReset(btFront: BluetoothFront) {
+		super.actionAfterReset(btFront)
+		requestAllSensorsData(btFront)
+	}
+
+	override fun validateReset(data: UByteArray): Boolean {
+		return extractCommand(data) == VALUES_COMMANDS[0]
+	}
+
+	//endregion
+
+	override fun onBluetoothConnected() {
+		super.onBluetoothConnected()
+		requestAllSensorsData(btFront)
+	}
+
+	override fun onAttachFragmentToReality() {
+		super.onAttachFragmentToReality()
 		if (isBluetoothConnected) {
-			BluetoothModel.requestAllSensorsData(btFront)
+			requestAllSensorsData(btFront)
 		}
 	}
 
@@ -27,7 +57,7 @@ class SensorsPresenter(btFront: BluetoothFront) :
 
 		BluetoothModel.let {
 
-			val command = data[1]
+			val command = it.extractCommand(data)
 			val value = it.extractValue(data)
 
 			when (command) {
@@ -45,10 +75,10 @@ class SensorsPresenter(btFront: BluetoothFront) :
 					viewState.showPressure(value.toFloat() / 1000f)
 				}
 				it._P_BATTERY_VOLTAGE -> {
-					viewState.showVoltage(value.toFloat() / 100f)
+					viewState.showVoltage(value.toInt())
 				}
 				it._P_ENERGY_USAGE    -> {
-					viewState.showEnergyUsage(value.toFloat() / 100f)
+					viewState.showEnergyUsage(value.toInt())
 				}
 				it._P_ENERGY_GEN      -> {
 					viewState.showEnergyGen(value.toInt())
@@ -56,8 +86,8 @@ class SensorsPresenter(btFront: BluetoothFront) :
 			}
 
 			// Пул полностью обработан и фрагмент присутствует на экране
-			if (command == it.VALUES_COMMANDS.last() && isViewInReality)
-				it.requestAllSensorsData(btFront)
+			if (command == VALUES_COMMANDS.last() && isFragmentInReality)
+				requestAllSensorsData(btFront)
 		}
 
 		return true

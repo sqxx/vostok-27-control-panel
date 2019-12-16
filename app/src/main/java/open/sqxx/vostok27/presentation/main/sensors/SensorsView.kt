@@ -9,8 +9,8 @@ interface SensorsView : MvpView {
 	fun showHumidity(value: Int)
 	fun showPressure(value: Float)
 
-	fun showVoltage(value: Float)
-	fun showEnergyUsage(value: Float)
+	fun showVoltage(value: Int)
+	fun showEnergyUsage(value: Int)
 	fun showEnergyGen(value: Int)
 
 	fun reset()
