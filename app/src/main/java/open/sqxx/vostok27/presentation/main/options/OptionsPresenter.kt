@@ -79,7 +79,7 @@ class OptionsPresenter(btFront: BluetoothFront) :
 			val value = it.extractValue(data).toInt()
 
 			val minute = (value / 60 % 60)
-			val hour = ((value - (minute * 60)) % 86400 / 3600)
+			val hour = (value / 3600 % 24)
 
 			when (command) {
 				_P_GET_TIME       -> viewState.updateCurrentTime(hour, minute)
