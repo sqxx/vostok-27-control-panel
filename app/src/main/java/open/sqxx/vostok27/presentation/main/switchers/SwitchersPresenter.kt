@@ -6,10 +6,18 @@ import open.sqxx.vostok27.model.repository.BluetoothModel
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_GET_LIGHT_LEVEL
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_SET_LIGHT_LEVEL
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_STATUS_AUTO_LIGHT
+import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_STATUS_CAMERAS
+import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_STATUS_CO2_NUTRALIZATION
+import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_STATUS_FAN
+import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_STATUS_HEAT_MODULE
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_STATUS_PRES_RELIEF_VALVE
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_STATUS_PROD_CO2
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_STATUS_PUMP_VALVE
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_SWITCH_AUTO_LIGHT
+import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_SWITCH_CAMERAS
+import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_SWITCH_CO2_NUTRALIZATION
+import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_SWITCH_FAN
+import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_SWITCH_HEAT_MODULE
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_SWITCH_PRES_RELIEF_VALVE
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_SWITCH_PROD_CO2
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_SWITCH_PUMP_VALVE
@@ -24,9 +32,16 @@ class SwitchersPresenter(btFront: BluetoothFront) :
 
 	companion object {
 		private val SWITCHERS_STATUS_COMMANDS = ubyteArrayOf(
+			_P_STATUS_CAMERAS,
+
 			_P_STATUS_PRES_RELIEF_VALVE,
 			_P_STATUS_PUMP_VALVE,
+
 			_P_STATUS_PROD_CO2,
+			_P_STATUS_CO2_NUTRALIZATION,
+			_P_STATUS_FAN,
+			_P_STATUS_HEAT_MODULE,
+
 			_P_STATUS_AUTO_LIGHT,
 			_P_GET_LIGHT_LEVEL
 		)
@@ -63,6 +78,9 @@ class SwitchersPresenter(btFront: BluetoothFront) :
 			val isEnabled = (value.toUByte() != _P_SYSTEM_DISABLED)
 
 			when (command) {
+				_P_STATUS_CAMERAS           -> {
+					viewState.updateCamerasState(isEnabled)
+				}
 				_P_STATUS_PRES_RELIEF_VALVE -> {
 					viewState.updatePressureReliefValveState(isEnabled)
 				}
@@ -71,6 +89,15 @@ class SwitchersPresenter(btFront: BluetoothFront) :
 				}
 				_P_STATUS_PROD_CO2          -> {
 					viewState.updateProdCO2State(isEnabled)
+				}
+				_P_STATUS_CO2_NUTRALIZATION -> {
+					viewState.updateNeutCO2State(isEnabled)
+				}
+				_P_STATUS_FAN               -> {
+					viewState.updateFanState(isEnabled)
+				}
+				_P_STATUS_HEAT_MODULE       -> {
+					viewState.updateHeatState(isEnabled)
 				}
 				_P_STATUS_AUTO_LIGHT        -> {
 					viewState.updateAutoLightState(isEnabled)
@@ -84,6 +111,9 @@ class SwitchersPresenter(btFront: BluetoothFront) :
 		return true
 	}
 
+	fun setCamerasState(isEnabled: Boolean) =
+		setState(_P_SWITCH_CAMERAS, isEnabled)
+
 	fun setPressureReliefValveState(isEnabled: Boolean) =
 		setState(_P_SWITCH_PRES_RELIEF_VALVE, isEnabled)
 
@@ -92,6 +122,15 @@ class SwitchersPresenter(btFront: BluetoothFront) :
 
 	fun setProdCO2State(isEnabled: Boolean) =
 		setState(_P_SWITCH_PROD_CO2, isEnabled)
+
+	fun setNeutCO2State(isEnabled: Boolean) =
+		setState(_P_SWITCH_CO2_NUTRALIZATION, isEnabled)
+
+	fun setFanState(isEnabled: Boolean) =
+		setState(_P_SWITCH_FAN, isEnabled)
+
+	fun setHeatState(isEnabled: Boolean) =
+		setState(_P_SWITCH_HEAT_MODULE, isEnabled)
 
 	fun setAutoLightState(isEnabled: Boolean) =
 		setState(_P_SWITCH_AUTO_LIGHT, isEnabled)

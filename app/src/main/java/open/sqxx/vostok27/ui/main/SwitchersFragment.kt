@@ -52,15 +52,25 @@ class SwitchersFragment(val btFront: BluetoothFront) : BaseFragment(), Switchers
 		// Чтобы не сломать консистентность ui,
 		//   замораживаем элементы управления до получения состояния на slave
 
+		cameras_switcher.updateState(false)
+
 		pressure_relief_valve_switcher.updateState(false)
 		pump_valve_switcher.updateState(false)
+
 		prod_co2_switcher.updateState(false)
+		neut_co2_switcher.updateState(false)
+		fan_switcher.updateState(false)
+		heat_switcher.updateState(false)
 
 		light_level.isEnabled = false
 		auto_light_switcher.updateState(false)
 	}
 
 	private fun bindListeners() {
+		cameras_switcher.onToggleListener = {
+			presenter.setCamerasState(it)
+		}
+
 		pressure_relief_valve_switcher.onToggleListener = {
 			presenter.setPressureReliefValveState(it)
 		}
@@ -73,6 +83,18 @@ class SwitchersFragment(val btFront: BluetoothFront) : BaseFragment(), Switchers
 			presenter.setProdCO2State(it)
 		}
 
+		neut_co2_switcher.onToggleListener = {
+			presenter.setNeutCO2State(it)
+		}
+
+		fan_switcher.onToggleListener = {
+			presenter.setFanState(it)
+		}
+
+		heat_switcher.onToggleListener = {
+			presenter.setHeatState(it)
+		}
+
 		light_level.setOnChangeListener { _, value ->
 			presenter.setLightLevel(value.roundToInt().toUInt())
 		}
@@ -82,6 +104,9 @@ class SwitchersFragment(val btFront: BluetoothFront) : BaseFragment(), Switchers
 		}
 	}
 
+	override fun updateCamerasState(isEnabled: Boolean) =
+		updateSwitcherState(cameras_switcher, isEnabled)
+
 	override fun updatePressureReliefValveState(isEnabled: Boolean) =
 		updateSwitcherState(pressure_relief_valve_switcher, isEnabled)
 
@@ -90,6 +115,15 @@ class SwitchersFragment(val btFront: BluetoothFront) : BaseFragment(), Switchers
 
 	override fun updateProdCO2State(isEnabled: Boolean) =
 		updateSwitcherState(prod_co2_switcher, isEnabled)
+
+	override fun updateNeutCO2State(isEnabled: Boolean) =
+		updateSwitcherState(neut_co2_switcher, isEnabled)
+
+	override fun updateFanState(isEnabled: Boolean) =
+		updateSwitcherState(fan_switcher, isEnabled)
+
+	override fun updateHeatState(isEnabled: Boolean) =
+		updateSwitcherState(heat_switcher, isEnabled)
 
 	override fun updateAutoLightState(isEnabled: Boolean) {
 		light_level.isEnabled = !isEnabled

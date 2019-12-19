@@ -14,6 +14,41 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <!-- Управление системами -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/system_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            app:cardElevation="4dp">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="12dp"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/TextAppearance.AppCompat.Headline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="Системы" />
+
+                <open.sqxx.vostok27.ui.main.view.OptionSwitcherView
+                    android:id="@+id/cameras_switcher"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:description="Управление камерами внутри модуля"
+                    app:label="Камеры" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </androidx.cardview.widget.CardView>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="4dp" />
+
         <!-- Управление станцией -->
         <androidx.cardview.widget.CardView
             android:id="@+id/values_container"
@@ -33,7 +68,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="4dp"
-                    android:text="@string/card_main_systems_title" />
+                    android:text="Рабочее положение" />
 
                 <open.sqxx.vostok27.ui.main.view.OptionSwitcherView
                     android:id="@+id/pressure_relief_valve_switcher"
@@ -49,12 +84,61 @@
                     app:description="Управление клапаном баллона с воздухом"
                     app:label="Надув станции" />
 
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </androidx.cardview.widget.CardView>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="4dp" />
+
+        <!-- Жизнеобеспечение -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/life_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            app:cardElevation="4dp">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="12dp"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/TextAppearance.AppCompat.Headline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/card_main_systems_title" />
+
                 <open.sqxx.vostok27.ui.main.view.OptionSwitcherView
                     android:id="@+id/prod_co2_switcher"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:description="Управление химической реакцией для выработки углекислого газа"
                     app:label="Выработка CO₂" />
+
+                <open.sqxx.vostok27.ui.main.view.OptionSwitcherView
+                    android:id="@+id/neut_co2_switcher"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:description="Управление системой для нейтрализации углекислого газа"
+                    app:label="Нейтрализация CO₂" />
+
+                <open.sqxx.vostok27.ui.main.view.OptionSwitcherView
+                    android:id="@+id/fan_switcher"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:description="Управление вентилятором возле нейтрализатора"
+                    app:label="Прогон воздуха" />
+
+                <open.sqxx.vostok27.ui.main.view.OptionSwitcherView
+                    android:id="@+id/heat_switcher"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:description="Нагрев воздуха на станции"
+                    app:label="Обогреватель" />
 
             </androidx.appcompat.widget.LinearLayoutCompat>
         </androidx.cardview.widget.CardView>
