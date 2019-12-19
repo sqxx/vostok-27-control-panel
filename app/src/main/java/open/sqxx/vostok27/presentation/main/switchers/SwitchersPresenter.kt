@@ -15,7 +15,6 @@ import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_SWITCH_PR
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_SWITCH_PUMP_VALVE
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_SYSTEM_DISABLED
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_SYSTEM_ENABLED
-import open.sqxx.vostok27.model.repository.BluetoothModel.Companion.extractCommand
 import open.sqxx.vostok27.presentation.main.BluetoothFragmentPresenter
 
 @ExperimentalUnsignedTypes
@@ -33,7 +32,7 @@ class SwitchersPresenter(btFront: BluetoothFront) :
 		)
 	}
 
-	private var latestPackage: UByteArray = ubyteArrayOf()
+	private var latestPackage: UByteArray? = null
 
 	init {
 		viewState.initialize()
@@ -42,32 +41,7 @@ class SwitchersPresenter(btFront: BluetoothFront) :
 	private fun requestValues() =
 		SWITCHERS_STATUS_COMMANDS.forEach { requestState(it) }
 
-	//region Обработка команды reset
-
-	override fun actionAfterReset(btFront: BluetoothFront) {
-		super.actionAfterReset(btFront)
-
-		// Если сбой произошёл при опросе состояния систем...
-		if (extractCommand(latestPackage) in SWITCHERS_STATUS_COMMANDS)
-			requestValues()
-
-		// В противном случае повторяем прошлый пакет вновь
-		else
-			btFront.sender.value = latestPackage
-	}
-
-	override fun validateReset(data: UByteArray): Boolean {
-		val command = extractCommand(data)
-
-		return if (command == SWITCHERS_STATUS_COMMANDS[0])
-			true
-		else extractCommand(latestPackage) == command
-	}
-
-	//endregion
-
 	override fun onBluetoothConnected() {
-		super.onBluetoothConnected()
 		requestValues()
 	}
 
@@ -86,22 +60,22 @@ class SwitchersPresenter(btFront: BluetoothFront) :
 			val command = it.extractCommand(data)
 			val value = it.extractValue(data)
 
-			val isEnabled = (value.toUByte() == _P_SYSTEM_ENABLED)
+			val isEnabled = (value.toUByte() != _P_SYSTEM_DISABLED)
 
 			when (command) {
-				_P_SWITCH_PRES_RELIEF_VALVE, _P_STATUS_PRES_RELIEF_VALVE -> {
+				_P_STATUS_PRES_RELIEF_VALVE -> {
 					viewState.updatePressureReliefValveState(isEnabled)
 				}
-				_P_SWITCH_PUMP_VALVE, _P_STATUS_PUMP_VALVE               -> {
+				_P_STATUS_PUMP_VALVE        -> {
 					viewState.updatePumpValveState(isEnabled)
 				}
-				_P_SWITCH_PROD_CO2, _P_STATUS_PROD_CO2                   -> {
+				_P_STATUS_PROD_CO2          -> {
 					viewState.updateProdCO2State(isEnabled)
 				}
-				_P_SWITCH_AUTO_LIGHT, _P_STATUS_AUTO_LIGHT               -> {
+				_P_STATUS_AUTO_LIGHT        -> {
 					viewState.updateAutoLightState(isEnabled)
 				}
-				_P_GET_LIGHT_LEVEL                                       -> {
+				_P_GET_LIGHT_LEVEL          -> {
 					viewState.updateLightLevel(value.toInt())
 				}
 			}

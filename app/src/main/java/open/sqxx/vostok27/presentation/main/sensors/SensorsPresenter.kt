@@ -3,7 +3,6 @@ package open.sqxx.vostok27.presentation.main.sensors
 import com.arellomobile.mvp.InjectViewState
 import open.sqxx.vostok27.model.repository.BluetoothFront
 import open.sqxx.vostok27.model.repository.BluetoothModel
-import open.sqxx.vostok27.model.repository.BluetoothModel.Companion.extractCommand
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion.requestData
 import open.sqxx.vostok27.presentation.main.BluetoothFragmentPresenter
 
@@ -27,21 +26,7 @@ class SensorsPresenter(btFront: BluetoothFront) :
 	private fun requestAllSensorsData(btFront: BluetoothFront) =
 		VALUES_COMMANDS.forEach { requestData(btFront, it) }
 
-	//region Обработка команды reset
-
-	override fun actionAfterReset(btFront: BluetoothFront) {
-		super.actionAfterReset(btFront)
-		requestAllSensorsData(btFront)
-	}
-
-	override fun validateReset(data: UByteArray): Boolean {
-		return extractCommand(data) == VALUES_COMMANDS[0]
-	}
-
-	//endregion
-
 	override fun onBluetoothConnected() {
-		super.onBluetoothConnected()
 		requestAllSensorsData(btFront)
 	}
 

@@ -9,7 +9,6 @@ import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_GET_TIME
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_SET_DAY_TIME
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_SET_NIGHT_TIME
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_SET_TIME
-import open.sqxx.vostok27.model.repository.BluetoothModel.Companion.extractCommand
 import open.sqxx.vostok27.presentation.main.BluetoothFragmentPresenter
 
 @ExperimentalUnsignedTypes
@@ -33,30 +32,6 @@ class OptionsPresenter(btFront: BluetoothFront) :
 
 	private fun requestTime() =
 		GET_TIME_COMMANDS.forEach { requestValue(it) }
-
-	//region Обработка команды reset
-
-	override fun actionAfterReset(btFront: BluetoothFront) {
-		super.actionAfterReset(btFront)
-
-		// Если сбой произошёл при опросе состояния систем...
-		if (extractCommand(latestPackage) in GET_TIME_COMMANDS)
-			requestTime()
-
-		// В противном случае повторяем прошлый пакет вновь
-		else
-			btFront.sender.value = latestPackage
-	}
-
-	override fun validateReset(data: UByteArray): Boolean {
-		val command = extractCommand(data)
-
-		return if (command == GET_TIME_COMMANDS[0])
-			true
-		else extractCommand(latestPackage) == command
-	}
-
-	//endregion
 
 	override fun onBluetoothConnected() {
 		super.onBluetoothConnected()

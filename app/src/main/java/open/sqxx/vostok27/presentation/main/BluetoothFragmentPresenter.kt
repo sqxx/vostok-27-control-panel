@@ -4,6 +4,12 @@ import android.annotation.SuppressLint
 import com.arellomobile.mvp.MvpPresenter
 import com.arellomobile.mvp.MvpView
 import open.sqxx.vostok27.model.repository.*
+import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._PE_PACKAGE_CRC
+import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._PE_PACKAGE_ERROR
+import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._PE_UNKNOWN_CMD
+import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_INIT_COMPLETE
+import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_NOT_READY
+import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_STARTUP
 import timber.log.Timber
 
 @ExperimentalUnsignedTypes
@@ -11,7 +17,12 @@ import timber.log.Timber
 abstract class BluetoothFragmentPresenter<T : MvpView>(val btFront: BluetoothFront) :
 	MvpPresenter<T>() {
 
-	protected var isBluetoothConnected = false
+	protected val isBluetoothConnected: Boolean
+		get() {
+			val status = btFront.status.value
+			return status == BluetoothStatus.CONNECTED || status == BluetoothStatus.READY
+		}
+
 	protected var isFragmentInReality = false
 
 	init {
@@ -33,13 +44,9 @@ abstract class BluetoothFragmentPresenter<T : MvpView>(val btFront: BluetoothFro
 
 	//region События
 
-	protected open fun onBluetoothConnected() {
-		isBluetoothConnected = true
-	}
+	protected open fun onBluetoothConnected() {}
 
-	protected open fun onBluetoothDisconnected() {
-		isBluetoothConnected = false
-	}
+	protected open fun onBluetoothDisconnected() {}
 
 	open fun onAttachFragmentToReality() {
 		isFragmentInReality = true
@@ -52,49 +59,79 @@ abstract class BluetoothFragmentPresenter<T : MvpView>(val btFront: BluetoothFro
 	//endregion
 
 	protected open fun handleData(data: UByteArray): Boolean {
+		var result: Boolean
 		BluetoothModel.let {
 
-			// Обработка команды сброса
-			it.handleReset(data) { d -> validateReset(d) }
-			if (it.isResetRequested()) {
-				it.resetBluetoothPull(btFront) { bt -> actionAfterReset(bt) }
-				return false
-			}
+			// Проверка валидности пакета
+			result = checkPackage(data)
+			if (!result) return false
 
-			// Проверка пакета
-			when (it.checkPackage(data)) {
-				BluetoothPackageStatus.INCORRECT_SIZE       -> {
-					it.handleIncorrectSize(btFront) { bt -> actionAfterReset(bt) }
-					handleIncorrectSize(data)
-					return false
-				}
-				BluetoothPackageStatus.INCORRECT_MAGIC_BYTE -> {
-					it.handleIncorrectMagicByte(btFront) { bt -> actionAfterReset(bt) }
-					handleIncorrectMagicByte(data)
-					return false
-				}
-				BluetoothPackageStatus.INCORRECT_CRC        -> {
-					it.handleIncorrectCRC(btFront) { bt -> actionAfterReset(bt) }
-					handleIncorrectCRC(data)
-					return false
-				}
-				BluetoothPackageStatus.VALID                -> {
-					// nothing to do
-				}
-			}
+			// Проверка исключений по протоколу
+			result = checkProtocolExceptions(data)
+			if (!result) return false
 
+			// Проверка статус кодов по протоколу
+			result = checkProtocolStatuses(data)
+			if (!result) return false
+
+			return true
 		}
-
-		return true
 	}
 
-	//region Обработка команды reset
+	private fun checkPackage(data: UByteArray): Boolean {
+		BluetoothModel.let {
+			return when (it.checkPackage(data)) {
+				BluetoothPackageStatus.INCORRECT_SIZE       -> {
+					handleIncorrectSize(data)
+					false
+				}
+				BluetoothPackageStatus.INCORRECT_MAGIC_BYTE -> {
+					handleIncorrectMagicByte(data)
+					false
+				}
+				BluetoothPackageStatus.INCORRECT_CRC        -> {
+					handleIncorrectCRC(data)
+					false
+				}
+				BluetoothPackageStatus.VALID                -> {
+					true
+				}
+			}
+		}
+	}
 
-	protected open fun validateReset(data: UByteArray): Boolean = true
+	private fun checkProtocolExceptions(data: UByteArray): Boolean {
+		BluetoothModel.let {
+			return when (val command = it.extractCommand(data)) {
+				_PE_PACKAGE_ERROR,
+				_PE_PACKAGE_CRC -> {
+					Timber.e("Исключение на стороне slave")
+					false
+				}
+				_PE_UNKNOWN_CMD -> {
+					Timber.e("Unimplemented ${Integer.toHexString(command.toInt())}")
+					false
+				}
+				else            ->
+					true
+			}
+		}
+	}
 
-	protected open fun actionAfterReset(btFront: BluetoothFront) {}
-
-	//endregion
+	private fun checkProtocolStatuses(data: UByteArray): Boolean {
+		BluetoothModel.let {
+			return when (it.extractCommand(data)) {
+				_P_STARTUP,
+				_P_INIT_COMPLETE,
+				_P_NOT_READY -> {
+					Timber.d("Станция ещё не готова")
+					false
+				}
+				else         ->
+					true
+			}
+		}
+	}
 
 	//region Обработка исключений
 
