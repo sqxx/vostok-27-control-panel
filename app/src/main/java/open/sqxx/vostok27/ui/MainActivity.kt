@@ -28,8 +28,6 @@ import javax.inject.Inject
 @ExperimentalUnsignedTypes
 class MainActivity : MvpAppCompatActivity() {
 
-	//region Данные
-
 	@Inject
 	lateinit var appLauncher: AppLauncher
 
@@ -65,25 +63,23 @@ class MainActivity : MvpAppCompatActivity() {
 			}
 		}
 
-	//endregion
-
 	//region Жизненный цикл
 
 	override fun onStart() {
 		super.onStart()
-		appLauncher.coldStart(bluetoothFront)
-		return
+
 		if (!bt.isBluetoothEnabled) {
 			enableBluetooth()
 			selectBluetoothDevice()
-		} else {
-			if (!bt.isServiceAvailable) {
-				bt.setupService()
-				bt.startService(BluetoothState.DEVICE_ANDROID)
+			return
+		}
 
-				selectBluetoothDevice()
-				setup()
-			}
+		if (!bt.isServiceAvailable) {
+			bt.setupService()
+			bt.startService(BluetoothState.DEVICE_ANDROID)
+
+			selectBluetoothDevice()
+			setup()
 		}
 	}
 
@@ -98,11 +94,10 @@ class MainActivity : MvpAppCompatActivity() {
 
 		this.savedInstanceState = savedInstanceState
 
-		//todo remove hardcoded strings
 		if (!bt.isBluetoothAvailable) {
 			systemMessageNotifier.send(
 				SystemMessage(
-					"Bluetooth is unavailable",
+					"Bluetooth недоступен",
 					SystemMessageType.ALERT
 				)
 			)
@@ -167,8 +162,9 @@ class MainActivity : MvpAppCompatActivity() {
 
 	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 		if (requestCode == BluetoothState.REQUEST_CONNECT_DEVICE) {
-			if (resultCode == Activity.RESULT_OK)
+			if (resultCode == Activity.RESULT_OK) {
 				bt.connect(data)
+			}
 		} else if (requestCode == BluetoothState.REQUEST_ENABLE_BT) {
 			if (resultCode == Activity.RESULT_OK) {
 				bt.setupService()
@@ -177,7 +173,7 @@ class MainActivity : MvpAppCompatActivity() {
 			} else {
 				systemMessageNotifier.send(
 					SystemMessage(
-						"Bluetooth is required for the application to work",
+						"Bluetooth требуется для работы приложения",
 						SystemMessageType.ALERT
 					)
 				)
@@ -203,8 +199,9 @@ class MainActivity : MvpAppCompatActivity() {
 	}
 
 	private fun selectBluetoothDevice() {
-		if (bt.serviceState == BluetoothState.STATE_CONNECTED)
+		if (bt.serviceState == BluetoothState.STATE_CONNECTED) {
 			bt.disconnect()
+		}
 
 		bt.setDeviceTarget(BluetoothState.DEVICE_OTHER)
 
@@ -217,22 +214,18 @@ class MainActivity : MvpAppCompatActivity() {
 			if (data.isEmpty()) return@setOnDataReceivedListener
 
 			val d = data.toUByteArray()
+			val command = BluetoothModel.extractCommand(d)
 
-			val cmd = d[1]
-
-			if (cmd == BluetoothModel._P_STARTUP ||
-				cmd == BluetoothModel._P_INIT_COMPLETE ||
-				cmd == BluetoothModel._P_NOT_READY
+			if (command == BluetoothModel._P_STARTUP ||
+				command == BluetoothModel._P_INIT_COMPLETE ||
+				command == BluetoothModel._P_NOT_READY
 			) {
 				bluetoothFront.status.value = BluetoothStatus.WAIT_FOR_READY
-				//todo: Добавить диалог прогресса
-			} else {
-				if (bluetoothFront.status.value != BluetoothStatus.READY) {
-					bluetoothFront.status.value = BluetoothStatus.READY
-				}
-
-				bluetoothFront.receiver.value = d
+			} else if (bluetoothFront.status.value != BluetoothStatus.READY) {
+				bluetoothFront.status.value = BluetoothStatus.READY
 			}
+
+			bluetoothFront.receiver.value = d
 		}
 
 		bt.setBluetoothConnectionListener(object : BluetoothSPP.BluetoothConnectionListener {
@@ -252,7 +245,12 @@ class MainActivity : MvpAppCompatActivity() {
 			override fun onDeviceConnectionFailed() {
 				bluetoothFront.status.value = BluetoothStatus.NONE
 
-				//todo: Показать сообщение об ошибке
+				systemMessageNotifier.send(
+					SystemMessage(
+						"Не удалось подключится к Bluetooth усройству",
+						SystemMessageType.TOAST
+					)
+				)
 
 				selectBluetoothDevice()
 			}
