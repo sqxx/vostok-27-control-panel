@@ -151,8 +151,8 @@ class SensorValueView(
 		// Перемещаем линию координаты X вниз
 		chart.xAxis.position = XAxis.XAxisPosition.BOTTOM
 
-		chart.xAxis.textColor = Color.WHITE
-		chart.axisLeft.textColor = Color.WHITE
+		chart.xAxis.textColor = Color.BLACK
+		chart.axisLeft.textColor = Color.BLACK
 
 		// Отображение дат, вместо индексов значений
 		chart.xAxis.valueFormatter = object : ValueFormatter() {
@@ -164,7 +164,7 @@ class SensorValueView(
 		// Настройка отображения графика
 		set = LineDataSet(null, null)
 
-		set!!.color = Color.WHITE
+		set!!.color = Color.BLACK
 		set!!.lineWidth = 1f
 
 		set!!.setDrawCircleHole(false)
@@ -173,12 +173,12 @@ class SensorValueView(
 		set!!.circleRadius = 2f
 
 		set!!.valueTextSize = 9f
-		set!!.setValueTextColors(listOf(Color.WHITE))
+		set!!.setValueTextColors(listOf(Color.BLACK))
 
 		set!!.formLineWidth = 1f
 		set!!.formSize = 15f
 
-		set!!.fillColor = Color.WHITE
+		set!!.fillColor = Color.BLACK
 	}
 
 	private fun refreshChart() {
