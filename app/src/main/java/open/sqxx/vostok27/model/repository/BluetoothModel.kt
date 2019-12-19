@@ -19,11 +19,11 @@ class BluetoothModel {
 
 		const val START_MAGIC: UByte = 0xF4u
 
-		const val _P_CODE_SUCCESS: UByte = 0x00u
-		const val _P_CODE_FAILURE: UByte = 0xFFu
+		const val _P_CODE_SUCCESS: UByte = 0xFFu
+		const val _P_CODE_FAILURE: UByte = 0x00u
 
-		const val _P_SYSTEM_ENABLED: UByte = 0x00u
-		const val _P_SYSTEM_DISABLED: UByte = 0xFFu
+		const val _P_SYSTEM_ENABLED: UByte = 0xFFu
+		const val _P_SYSTEM_DISABLED: UByte = 0x00u
 
 		//region Состояние
 
@@ -51,48 +51,66 @@ class BluetoothModel {
 
 		//region Управление системами
 
-		const val _P_SWITCH_PRES_RELIEF_VALVE: UByte = 0xB1u
-		const val _P_STATUS_PRES_RELIEF_VALVE: UByte = 0xB2u
+		// Клапан накачки станции
+		const val _P_SWITCH_PUMP_VALVE: UByte = 0xB0u
+		const val _P_STATUS_PUMP_VALVE: UByte = 0xB1u
 
-		const val _P_SWITCH_PUMP_VALVE: UByte = 0xB3u
-		const val _P_STATUS_PUMP_VALVE: UByte = 0xB4u
+		// Клапан сброса давления
+		const val _P_SWITCH_PRES_RELIEF_VALVE: UByte = 0xB2u
+		const val _P_STATUS_PRES_RELIEF_VALVE: UByte = 0xB3u
 
-		const val _P_SWITCH_PROD_CO2: UByte = 0xB5u
-		const val _P_STATUS_PROD_CO2: UByte = 0xB6u
+		// Выработка CO2
+		const val _P_SWITCH_PROD_CO2: UByte = 0xB4u
+		const val _P_STATUS_PROD_CO2: UByte = 0xB5u
 
-		const val _P_SWITCH_AUTO_LIGHT: UByte = 0xB7u
-		const val _P_STATUS_AUTO_LIGHT: UByte = 0xB8u
+		// Нейтрализатор CO2
+		const val _P_SWITCH_CO2_NUTRALIZATION: UByte = 0xB6u
+		const val _P_STATUS_CO2_NUTRALIZATION: UByte = 0xB7u
 
+		// Обогреватель
+		const val _P_SWITCH_HEAT_MODULE: UByte = 0xB8u
+		const val _P_STATUS_HEAT_MODULE: UByte = 0xB9u
+
+		// Вентилятор обогревателя
+		const val _P_SWITCH_FAN: UByte = 0xBAu
+		const val _P_STATUS_FAN: UByte = 0xBBu
+
+		// Камеры
+		const val _P_SWITCH_CAMERAS: UByte = 0xBCu
+		const val _P_STATUS_CAMERAS: UByte = 0xBDu
+
+		// Автоматическое управление освещением
+		const val _P_SWITCH_AUTO_LIGHT: UByte = 0xBEu
+		const val _P_STATUS_AUTO_LIGHT: UByte = 0xBFu
+
+		// Уровень яркости
 		const val _P_SET_LIGHT_LEVEL: UByte = 0xC1u
 		const val _P_GET_LIGHT_LEVEL: UByte = 0xC2u
 
+		// Время на станции
 		const val _P_SET_TIME: UByte = 0xD1u
 		const val _P_GET_TIME: UByte = 0xD4u
 
+		// Время дня
 		const val _P_SET_DAY_TIME: UByte = 0xD2u
 		const val _P_GET_DAY_TIME: UByte = 0xD5u
 
+		// Время ночи
 		const val _P_SET_NIGHT_TIME: UByte = 0xD3u
 		const val _P_GET_NIGHT_TIME: UByte = 0xD6u
-
-		const val _P_SERIAL_RESET: UByte = 0xEAu
 
 		//endregion
 
 		//region Исключения
 
 		const val _PE_PACKAGE_ERROR: UByte = 0xE1u
+		const val _PE_PACKAGE_CRC: UByte = 0xE2u
+		const val _PE_UNKNOWN_CMD: UByte = 0xE3u
 
 		const val _PE_PACKAGE_ERR_CRLF: UByte = 0xDAu
 		const val _PE_PACKAGE_ERR_MAGIC: UByte = 0xF4u
 
-		const val _PE_PACKAGE_CRC: UByte = 0xE2u
-
-		const val _PE_UNKNOWN_CMD: UByte = 0xE3u
-
 		//endregion
-
-		private var resetRequested = false
 
 		//endregion
 
@@ -223,55 +241,6 @@ class BluetoothModel {
 				return it
 			}
 		}
-
-		fun requestReset(btFront: BluetoothFront): UByteArray {
-			resetRequested = true
-			return requestData(btFront, _P_SERIAL_RESET.toUByte())
-		}
-
-		//endregion
-
-		//region Обработка команды сброса
-
-		fun isResetRequested() = resetRequested
-
-		fun handleReset(
-			data: UByteArray,
-			validator: ((UByteArray) -> Boolean)
-		) {
-			val resetComplete = validator.invoke(data)
-
-			if (resetRequested && resetComplete) {
-				resetRequested = false
-			}
-		}
-
-		fun resetBluetoothPull(
-			btFront: BluetoothFront,
-			action: ((BluetoothFront) -> Any)
-		) {
-			requestReset(btFront)
-			action.invoke(btFront)
-		}
-
-		//endregion
-
-		//region Обработка исключений
-
-		fun handleIncorrectSize(
-			btFront: BluetoothFront,
-			action: ((BluetoothFront) -> Any)
-		) = resetBluetoothPull(btFront, action)
-
-		fun handleIncorrectMagicByte(
-			btFront: BluetoothFront,
-			action: ((BluetoothFront) -> Any)
-		) = resetBluetoothPull(btFront, action)
-
-		fun handleIncorrectCRC(
-			btFront: BluetoothFront,
-			action: ((BluetoothFront) -> Any)
-		) = resetBluetoothPull(btFront, action)
 
 		//endregion
 	}
