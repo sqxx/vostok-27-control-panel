@@ -71,6 +71,13 @@
                     android:text="Рабочее положение" />
 
                 <open.sqxx.vostok27.ui.main.view.OptionSwitcherView
+                    android:id="@+id/auto_pressure_switcher"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:description="Автоматическая стабилизация давления внутри модуля"
+                    app:label="Стабилизация давления" />
+
+                <open.sqxx.vostok27.ui.main.view.OptionSwitcherView
                     android:id="@+id/pressure_relief_valve_switcher"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

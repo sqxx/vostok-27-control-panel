@@ -54,6 +54,7 @@ class SwitchersFragment(val btFront: BluetoothFront) : BaseFragment(), Switchers
 
 		cameras_switcher.updateState(false)
 
+		auto_pressure_switcher.updateState(false)
 		pressure_relief_valve_switcher.updateState(false)
 		pump_valve_switcher.updateState(false)
 
@@ -69,6 +70,13 @@ class SwitchersFragment(val btFront: BluetoothFront) : BaseFragment(), Switchers
 	private fun bindListeners() {
 		cameras_switcher.onToggleListener = {
 			presenter.setCamerasState(it)
+		}
+
+		auto_pressure_switcher.onToggleListener = {
+			pressure_relief_valve_switcher.updateState(!it)
+			pump_valve_switcher.updateState(!it)
+
+			presenter.setAutoPressureState(it)
 		}
 
 		pressure_relief_valve_switcher.onToggleListener = {
@@ -107,6 +115,17 @@ class SwitchersFragment(val btFront: BluetoothFront) : BaseFragment(), Switchers
 	override fun updateCamerasState(isEnabled: Boolean) =
 		updateSwitcherState(cameras_switcher, isEnabled)
 
+	override fun updateAutoPresState(isEnabled: Boolean) {
+		updateSwitcherState(auto_pressure_switcher, isEnabled)
+
+		pressure_relief_valve_switcher.updateState(!isEnabled)
+		pump_valve_switcher.updateState(!isEnabled)
+
+		if (!isEnabled) {
+			presenter.requestValues()
+		}
+	}
+
 	override fun updatePressureReliefValveState(isEnabled: Boolean) =
 		updateSwitcherState(pressure_relief_valve_switcher, isEnabled)
 
@@ -126,8 +145,13 @@ class SwitchersFragment(val btFront: BluetoothFront) : BaseFragment(), Switchers
 		updateSwitcherState(heat_switcher, isEnabled)
 
 	override fun updateAutoLightState(isEnabled: Boolean) {
-		light_level.isEnabled = !isEnabled
 		updateSwitcherState(auto_light_switcher, isEnabled)
+
+		light_level.isEnabled = !isEnabled
+
+		if (!isEnabled) {
+			presenter.requestValues()
+		}
 	}
 
 	override fun updateLightLevel(value: Int) {

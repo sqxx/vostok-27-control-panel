@@ -6,6 +6,7 @@ import open.sqxx.vostok27.model.repository.BluetoothModel
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_GET_LIGHT_LEVEL
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_SET_LIGHT_LEVEL
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_STATUS_AUTO_LIGHT
+import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_STATUS_AUTO_PRES
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_STATUS_CAMERAS
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_STATUS_CO2_NUTRALIZATION
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_STATUS_FAN
@@ -14,6 +15,7 @@ import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_STATUS_PR
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_STATUS_PROD_CO2
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_STATUS_PUMP_VALVE
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_SWITCH_AUTO_LIGHT
+import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_SWITCH_AUTO_PRES
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_SWITCH_CAMERAS
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_SWITCH_CO2_NUTRALIZATION
 import open.sqxx.vostok27.model.repository.BluetoothModel.Companion._P_SWITCH_FAN
@@ -36,6 +38,7 @@ class SwitchersPresenter(btFront: BluetoothFront) :
 
 			_P_STATUS_PRES_RELIEF_VALVE,
 			_P_STATUS_PUMP_VALVE,
+			_P_STATUS_AUTO_PRES,
 
 			_P_STATUS_PROD_CO2,
 			_P_STATUS_CO2_NUTRALIZATION,
@@ -53,7 +56,7 @@ class SwitchersPresenter(btFront: BluetoothFront) :
 		viewState.initialize()
 	}
 
-	private fun requestValues() =
+	fun requestValues() =
 		SWITCHERS_STATUS_COMMANDS.forEach { requestState(it) }
 
 	override fun onBluetoothConnected() {
@@ -80,6 +83,9 @@ class SwitchersPresenter(btFront: BluetoothFront) :
 			when (command) {
 				_P_STATUS_CAMERAS           -> {
 					viewState.updateCamerasState(isEnabled)
+				}
+				_P_STATUS_AUTO_PRES         -> {
+					viewState.updateAutoPresState(isEnabled)
 				}
 				_P_STATUS_PRES_RELIEF_VALVE -> {
 					viewState.updatePressureReliefValveState(isEnabled)
@@ -113,6 +119,9 @@ class SwitchersPresenter(btFront: BluetoothFront) :
 
 	fun setCamerasState(isEnabled: Boolean) =
 		setState(_P_SWITCH_CAMERAS, isEnabled)
+
+	fun setAutoPressureState(isEnabled: Boolean) =
+		setState(_P_SWITCH_AUTO_PRES, isEnabled)
 
 	fun setPressureReliefValveState(isEnabled: Boolean) =
 		setState(_P_SWITCH_PRES_RELIEF_VALVE, isEnabled)

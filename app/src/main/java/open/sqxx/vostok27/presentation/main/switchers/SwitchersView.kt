@@ -7,6 +7,7 @@ interface SwitchersView : MvpView {
 
 	fun updateCamerasState(isEnabled: Boolean)
 
+	fun updateAutoPresState(isEnabled: Boolean)
 	fun updatePressureReliefValveState(isEnabled: Boolean)
 	fun updatePumpValveState(isEnabled: Boolean)
 
