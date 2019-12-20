@@ -79,25 +79,29 @@ class BluetoothModel {
 		const val _P_SWITCH_CAMERAS: UByte = 0xBCu
 		const val _P_STATUS_CAMERAS: UByte = 0xBDu
 
+		// Автоподдержка давления
+		const val _P_SWITCH_AUTO_PRES: UByte = 0xC1u
+		const val _P_STATUS_AUTO_PRES: UByte = 0xC2u
+
 		// Автоматическое управление освещением
 		const val _P_SWITCH_AUTO_LIGHT: UByte = 0xBEu
 		const val _P_STATUS_AUTO_LIGHT: UByte = 0xBFu
 
 		// Уровень яркости
-		const val _P_SET_LIGHT_LEVEL: UByte = 0xC1u
-		const val _P_GET_LIGHT_LEVEL: UByte = 0xC2u
+		const val _P_SET_LIGHT_LEVEL: UByte = 0xD4u
+		const val _P_GET_LIGHT_LEVEL: UByte = 0xDDu
 
 		// Время на станции
 		const val _P_SET_TIME: UByte = 0xD1u
-		const val _P_GET_TIME: UByte = 0xD4u
+		const val _P_GET_TIME: UByte = 0xDAu
 
 		// Время дня
 		const val _P_SET_DAY_TIME: UByte = 0xD2u
-		const val _P_GET_DAY_TIME: UByte = 0xD5u
+		const val _P_GET_DAY_TIME: UByte = 0xDBu
 
 		// Время ночи
 		const val _P_SET_NIGHT_TIME: UByte = 0xD3u
-		const val _P_GET_NIGHT_TIME: UByte = 0xD6u
+		const val _P_GET_NIGHT_TIME: UByte = 0xDCu
 
 		//endregion
 
